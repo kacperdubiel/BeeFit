@@ -56,6 +56,9 @@ class DatabaseModel:
     def select_user_by_email(self, email):
         return sqlite_db.select_user_by_email(self.conn, email)
 
+    def select_user_current_weight(self, id_user):
+        return sqlite_db.select_user_current_weight(self.conn, id_user)[0]
+
     def select_user_products(self, id_user):
         rows = sqlite_db.select_user_products(self.conn, id_user)
 

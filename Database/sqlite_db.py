@@ -155,6 +155,18 @@ def select_user_by_email(conn, user_email):
 
 
 @connect
+def select_user_current_weight(conn, user_login):
+    sql = """
+          SELECT WeightValue FROM Weights WHERE IdUser=? ORDER BY WeightDate DESC LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (user_login,))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
 def select_user_products(conn, user_id):
     sql = """
           SELECT * FROM Products WHERE IdUser=?;

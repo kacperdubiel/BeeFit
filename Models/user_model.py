@@ -8,6 +8,8 @@ class UserModel:
         self.user = user
         self.database_model = database_model
 
+        self.user['weight'] = self.get_user_current_weight()
+
         # Avatar settings
         self.AVATAR_MAX_SIZE = 140.0
         self.avatar_settings()
@@ -24,6 +26,9 @@ class UserModel:
         self.user['calories_left'] = self.get_calories_left()
 
         self.user['progressbar_percent'] = self.get_progressbar_percent()
+
+    def get_user_current_weight(self):
+        return self.database_model.select_user_current_weight(self.user['id_user'])
 
     def avatar_settings(self):
         self.user['avatar'] = self.get_image_from_bytes(self.user['avatar'])
