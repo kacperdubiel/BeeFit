@@ -1,0 +1,22 @@
+[
+  {
+    "training_name": "Bieganie",
+    "burned_calories_per_hour": 600
+  },
+  {
+    "training_name": "Gimnastyka",
+    "burned_calories_per_hour": 300
+  },
+  {
+    "training_name": "Pływanie",
+    "burned_calories_per_hour": 400
+  },
+  {
+    "training_name": "Spacer",
+    "burned_calories_per_hour": 200
+  },
+  {
+    "training_name": "Ćwiczenia siłowe",
+    "burned_calories_per_hour": 260
+  }
+]
