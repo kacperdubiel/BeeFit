@@ -204,6 +204,7 @@ def select_dishes_products(conn, dish_id):
     rows = cursor.fetchall()
     return rows
 
+
 @connect
 def select_first_gda_before_date(conn, id_user, current_date):
     sql = """
@@ -272,3 +273,15 @@ def select_user_consumed_dishes_at_date(conn, user_id, current_date):
 
     rows = cursor.fetchall()
     return rows
+
+
+# --- UPDATE ---
+
+@connect
+def update_user_avatar(conn, user_id, new_avatar):
+    sql = """
+          UPDATE Users SET Avatar=? WHERE IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_avatar, user_id))
+    conn.commit()

@@ -133,3 +133,8 @@ class UserModel:
         self.user['calories_left'] = self.get_calories_left()
 
         self.user['progressbar_percent'] = self.get_progressbar_percent()
+
+    def set_user_avatar(self, new_avatar):
+        self.user['avatar'] = new_avatar
+        self.avatar_settings()
+        self.database_model.update_user_avatar(self.user['id_user'], new_avatar)

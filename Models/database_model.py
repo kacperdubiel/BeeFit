@@ -117,6 +117,11 @@ class DatabaseModel:
             consumed_dishes.append(self.consumed_dish_row_to_consumed_dish_dict(row))
         return consumed_dishes
 
+    # --- UPDATE ---
+
+    def update_user_avatar(self, id_user, new_avatar):
+        sqlite_db.update_user_avatar(self.conn, id_user, new_avatar)
+
     # --- MISC ---
 
     @staticmethod
