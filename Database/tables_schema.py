@@ -38,7 +38,7 @@ SQL_TRAINING_TYPES_TABLE = """
                             CREATE TABLE IF NOT EXISTS TrainingTypes (
                                 IdTrainingType INTEGER PRIMARY KEY AUTOINCREMENT,
                                 TrainingName TEXT NOT NULL,
-                                BurnedCaloriesPerHour INTEGER NOT NULL,
+                                BurnedCaloriesPerMinPerKg REAL NOT NULL,
                                 UNIQUE(TrainingName)
                             );
                            """
@@ -48,7 +48,7 @@ SQL_TRAININGS_TABLE = """
                             IdTraining INTEGER PRIMARY KEY AUTOINCREMENT,
                             IdUser INTEGER NOT NULL,
                             IdTrainingType INTEGER NOT NULL,
-                            Duration INTEGER NOT NULL,
+                            DurationInMin INTEGER NOT NULL,
                             TrainingDate TEXT NOT NULL,
                             FOREIGN KEY (IdUser) REFERENCES Users (IdUser),
                             FOREIGN KEY (IdTrainingType) REFERENCES TrainingTypes (IdTrainingType)

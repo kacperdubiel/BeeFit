@@ -56,8 +56,29 @@ class DatabaseModel:
     def select_user_by_email(self, email):
         return sqlite_db.select_user_by_email(self.conn, email)
 
-    def select_user_current_weight(self, id_user):
-        return sqlite_db.select_user_current_weight(self.conn, id_user)[0]
+    def select_user_weight(self, id_user):
+        row = sqlite_db.select_user_weight(self.conn, id_user)
+        return self.weight_row_to_weight_dict(row)
+
+    def select_first_weight_before_date(self, id_user, current_date):
+        row = sqlite_db.select_first_weight_before_date(self.conn, id_user, current_date)
+        return self.weight_row_to_weight_dict(row)
+
+    def select_first_weight_after_date(self, id_user, current_date):
+        row = sqlite_db.select_first_weight_after_date(self.conn, id_user, current_date)
+        return self.weight_row_to_weight_dict(row)
+
+    def select_user_gda(self, id_user):
+        row = sqlite_db.select_user_gda(self.conn, id_user)
+        return self.gda_row_to_gda_dict(row)
+
+    def select_first_gda_before_date(self, id_user, current_date):
+        row = sqlite_db.select_first_gda_before_date(self.conn, id_user, current_date)
+        return self.gda_row_to_gda_dict(row)
+
+    def select_first_gda_after_date(self, id_user, current_date):
+        row = sqlite_db.select_first_gda_after_date(self.conn, id_user, current_date)
+        return self.gda_row_to_gda_dict(row)
 
     def select_user_products(self, id_user):
         rows = sqlite_db.select_user_products(self.conn, id_user)
@@ -85,16 +106,8 @@ class DatabaseModel:
             dishes.append(dish)
         return dishes
 
-    def select_first_gda_before_date(self, id_user, current_date):
-        row = sqlite_db.select_first_gda_before_date(self.conn, id_user, current_date)
-        return self.gda_row_to_gda_dict(row)
-
-    def select_first_gda_after_date(self, id_user, current_date):
-        row = sqlite_db.select_first_gda_after_date(self.conn, id_user, current_date)
-        return self.gda_row_to_gda_dict(row)
-
-    def select_user_trainings_by_date(self, id_user, current_date):
-        rows = sqlite_db.select_user_trainings_by_date(self.conn, id_user, current_date)
+    def select_user_trainings_at_date(self, id_user, current_date):
+        rows = sqlite_db.select_user_trainings_at_date(self.conn, id_user, current_date)
 
         trainings = list()
         for row in rows:
@@ -140,6 +153,19 @@ class DatabaseModel:
                 'avatar': row[9]
             }
             return user
+        else:
+            return None
+
+    @staticmethod
+    def weight_row_to_weight_dict(row):
+        if row is not None:
+            weight = {
+                'id_weight': row[0],
+                'id_user': row[1],
+                'weight_value': row[2],
+                'weight_date': row[3]
+            }
+            return weight
         else:
             return None
 
@@ -239,12 +265,11 @@ class DatabaseModel:
                 'id_training': row[0],
                 'id_training_type': row[1],
                 'id_user': row[2],
-                'duration': row[3],
+                'duration_in_min': row[3],
                 'training_date': row[4],
                 'training_name': row[6],
-                'burned_calories_per_hour': row[7]
+                'burned_calories_per_min_per_kg': row[7]
             }
             return training
         else:
             return None
-

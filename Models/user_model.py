@@ -8,18 +8,23 @@ class UserModel:
         self.user = user
         self.database_model = database_model
 
-        self.user['weight'] = self.get_user_current_weight()
+        self.user['current_date'] = get_current_date()
+        self.user['weight'] = self.get_user_weight()
+        self.user['current_date_weight'] = self.get_user_current_date_weight()
+
+        self.user['gda'] = self.get_user_gda()
+        self.user['current_date_gda'] = self.get_user_current_date_gda()
 
         # Avatar settings
         self.AVATAR_MAX_SIZE = 140.0
         self.avatar_settings()
 
-        self.user['current_date'] = get_current_date()
-
-        self.user['products'] = self.get_user_products()
         self.user['products_ids'] = []
-        self.user['dishes'] = self.get_user_dishes()
+        self.user['products'] = self.get_user_products()
         self.user['dishes_ids'] = []
+        self.user['dishes'] = self.get_user_dishes()
+
+        self.user['current_date_trainings'] = self.get_user_current_date_trainings()
 
         self.user['calories_to_consume'] = self.get_calories_to_consume()
         self.user['calories_consumed'] = self.get_calories_consumed()
@@ -27,8 +32,25 @@ class UserModel:
 
         self.user['progressbar_percent'] = self.get_progressbar_percent()
 
-    def get_user_current_weight(self):
-        return self.database_model.select_user_current_weight(self.user['id_user'])
+    def get_user_weight(self):
+        return self.database_model.select_user_weight(self.user['id_user'])
+
+    def get_user_current_date_weight(self):
+        found_weight = self.database_model.select_first_weight_before_date(self.user['id_user'],
+                                                                           self.user['current_date'])
+        if found_weight is None:
+            found_weight = self.database_model.select_first_weight_after_date(self.user['id_user'],
+                                                                              self.user['current_date'])
+        return found_weight
+
+    def get_user_gda(self):
+        return self.database_model.select_user_gda(self.user['id_user'])
+
+    def get_user_current_date_gda(self):
+        found_gda = self.database_model.select_first_gda_before_date(self.user['id_user'], self.user['current_date'])
+        if found_gda is None:
+            found_gda = self.database_model.select_first_gda_after_date(self.user['id_user'], self.user['current_date'])
+        return found_gda
 
     def avatar_settings(self):
         self.user['avatar'] = self.get_image_from_bytes(self.user['avatar'])
@@ -51,44 +73,37 @@ class UserModel:
     def get_user_products(self):
         user_products = self.database_model.select_user_products(self.user['id_user'])
         products = {}
-        products_ids = []
+        self.user['products_ids'] = []
         for product in user_products:
             products[f'{product["id_product"]}'] = product
-            products_ids.append(product["id_product"])
+            self.user['products_ids'].append(product["id_product"])
 
-        self.user['products_ids'] = products_ids
         return products
 
     def get_user_dishes(self):
         user_dishes = self.database_model.select_user_dishes(self.user['id_user'])
         dishes = {}
-        dishes_ids = []
+        self.user['dishes_ids'] = []
         for dish in user_dishes:
             dishes[f'{dish["id_dish"]}'] = dish
-            dishes_ids.append(dish["id_dish"])
+            self.user['dishes_ids'].append(dish["id_dish"])
 
-        self.user['dishes_ids'] = dishes_ids
         return dishes
 
-    def get_user_current_gda(self):
-        gda = 0
-
-        found_gda = self.database_model.select_first_gda_before_date(self.user['id_user'], self.user['current_date'])
-        if found_gda:
-            gda = found_gda['gda_value']
-        else:
-            found_gda = self.database_model.select_first_gda_after_date(self.user['id_user'], self.user['current_date'])
-            if found_gda:
-                gda = found_gda['gda_value']
-
-        return gda
-
-    def get_calories_to_consume(self):
-        calories_to_consume = self.get_user_current_gda()
-        current_trainings = self.database_model.select_user_trainings_by_date(self.user['id_user'],
+    def get_user_current_date_trainings(self):
+        current_trainings = self.database_model.select_user_trainings_at_date(self.user['id_user'],
                                                                               self.user['current_date'])
         for training in current_trainings:
-            calories_to_consume += int(training['duration'] * (training['burned_calories_per_hour']/60))
+            training['burned_calories'] = int(training['burned_calories_per_min_per_kg'] * training['duration_in_min']
+                                              * self.user['current_date_weight']['weight_value'])
+
+        return current_trainings
+
+    def get_calories_to_consume(self):
+        calories_to_consume = self.user['current_date_gda']['gda_value']
+
+        for training in self.user['current_date_trainings']:
+            calories_to_consume += training['burned_calories']
 
         return calories_to_consume
 
@@ -125,8 +140,10 @@ class UserModel:
     def set_current_date(self, new_date):
         self.user['current_date'] = new_date
 
-        self.user['products'] = self.get_user_products()
-        self.user['dishes'] = self.get_user_dishes()
+        self.user['current_date_weight'] = self.get_user_current_date_weight()
+        self.user['current_date_gda'] = self.get_user_current_date_gda()
+
+        self.user['current_date_trainings'] = self.get_user_current_date_trainings()
 
         self.user['calories_to_consume'] = self.get_calories_to_consume()
         self.user['calories_consumed'] = self.get_calories_consumed()

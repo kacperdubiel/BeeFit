@@ -74,7 +74,7 @@ def query(conn, sql, data_tuple):
 @connect
 def insert_many_training_types(conn, training_types_list):
     sql = """
-          INSERT INTO TrainingTypes (TrainingName, BurnedCaloriesPerHour)
+          INSERT INTO TrainingTypes (TrainingName, BurnedCaloriesPerMinPerKg)
           VALUES (?,?) 
           """
 
@@ -155,12 +155,72 @@ def select_user_by_email(conn, user_email):
 
 
 @connect
-def select_user_current_weight(conn, user_login):
+def select_user_weight(conn, user_login):
     sql = """
-          SELECT WeightValue FROM Weights WHERE IdUser=? ORDER BY WeightDate DESC LIMIT 1
+          SELECT * FROM Weights WHERE IdUser=? ORDER BY WeightDate DESC LIMIT 1
           """
     cursor = conn.cursor()
     cursor.execute(sql, (user_login,))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
+def select_first_weight_before_date(conn, id_user, current_date):
+    sql = """
+          SELECT * FROM Weights WHERE IdUser=? AND WeightDate<=? ORDER BY WeightDate DESC LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_user, current_date))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
+def select_first_weight_after_date(conn, id_user, current_date):
+    sql = """
+          SELECT * FROM Weights WHERE IdUser=? AND WeightDate>=? ORDER BY WeightDate ASC LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_user, current_date))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
+def select_user_gda(conn, user_login):
+    sql = """
+          SELECT * FROM GDAs WHERE IdUser=? ORDER BY GDADate DESC LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (user_login,))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
+def select_first_gda_before_date(conn, id_user, current_date):
+    sql = """
+          SELECT * FROM GDAs WHERE IdUser=? AND GDADate<=? ORDER BY GDADate DESC LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_user, current_date))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
+def select_first_gda_after_date(conn, id_user, current_date):
+    sql = """
+          SELECT * FROM GDAs WHERE IdUser=? AND GDADate>=? ORDER BY GDADate ASC LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_user, current_date))
 
     row = cursor.fetchone()
     return row
@@ -206,31 +266,7 @@ def select_dishes_products(conn, dish_id):
 
 
 @connect
-def select_first_gda_before_date(conn, id_user, current_date):
-    sql = """
-          SELECT * FROM GDAs WHERE IdUser=? AND GDADate<=? ORDER BY GDADate DESC LIMIT 1
-          """
-    cursor = conn.cursor()
-    cursor.execute(sql, (id_user, current_date))
-
-    row = cursor.fetchone()
-    return row
-
-
-@connect
-def select_first_gda_after_date(conn, id_user, current_date):
-    sql = """
-          SELECT * FROM GDAs WHERE IdUser=? AND GDADate>=? ORDER BY GDADate ASC LIMIT 1
-          """
-    cursor = conn.cursor()
-    cursor.execute(sql, (id_user, current_date))
-
-    row = cursor.fetchone()
-    return row
-
-
-@connect
-def select_user_trainings_by_date(conn, user_id, current_date):
+def select_user_trainings_at_date(conn, user_id, current_date):
     sql = """
           SELECT t.*, tt.*
           FROM Trainings AS t
