@@ -60,6 +60,10 @@ class DatabaseModel:
         row = sqlite_db.select_user_weight(self.conn, id_user)
         return self.weight_row_to_weight_dict(row)
 
+    def select_user_weight_by_date(self, id_user, date):
+        row = sqlite_db.select_user_weight_by_date(self.conn, id_user, date)
+        return self.weight_row_to_weight_dict(row)
+
     def select_first_weight_before_date(self, id_user, current_date):
         row = sqlite_db.select_first_weight_before_date(self.conn, id_user, current_date)
         return self.weight_row_to_weight_dict(row)
@@ -134,6 +138,27 @@ class DatabaseModel:
 
     def update_user_avatar(self, id_user, new_avatar):
         sqlite_db.update_user_avatar(self.conn, id_user, new_avatar)
+
+    def update_user_gender(self, id_user, new_gender):
+        sqlite_db.update_user_gender(self.conn, id_user, new_gender)
+
+    def update_user_weight_on_date(self, id_user, date, new_weight):
+        sqlite_db.update_user_weight_on_date(self.conn, id_user, date, new_weight)
+
+    def update_user_height(self, id_user, new_height):
+        sqlite_db.update_user_height(self.conn, id_user, new_height)
+
+    def update_user_age(self, id_user, new_age):
+        sqlite_db.update_user_age(self.conn, id_user, new_age)
+
+    def update_user_physical_activity(self, id_user, new_physical_activity):
+        sqlite_db.update_user_physical_activity(self.conn, id_user, new_physical_activity)
+
+    def update_user_goal(self, id_user, new_goal):
+        sqlite_db.update_user_goal(self.conn, id_user, new_goal)
+
+    def update_user_gda_on_date(self, id_user, date, new_gda):
+        sqlite_db.update_user_gda_on_date(self.conn, id_user, date, new_gda)
 
     # --- MISC ---
 

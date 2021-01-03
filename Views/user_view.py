@@ -4,6 +4,7 @@ from tkinter import *
 
 from PIL import ImageTk
 
+from Views.profile_view import ProfileView
 from Views.shared_view import center_window
 
 
@@ -12,6 +13,7 @@ class UserView(tk.Toplevel):
         tk.Toplevel.__init__(self, master)
         self.shared_view = shared_view
         self.user = user
+        self.withdraw()
 
         self.protocol('WM_DELETE_WINDOW', self.master.destroy)
         self.title('BeeFit')
@@ -24,6 +26,7 @@ class UserView(tk.Toplevel):
         self._create_tabs()
 
         center_window(self)
+        self.deiconify()
 
     def _create_user_view_frames(self):
         self.frame_user_view = ttk.Frame(self)
@@ -72,7 +75,7 @@ class UserView(tk.Toplevel):
 
         # First row - Greetings and logout btn
         self.label_greetings = Label(self.frame_top_right_block_first_row, text=f"Witaj {self.user['login']}!",
-                                     font=self.shared_view.font_style_10_bold)
+                                     font=self.shared_view.font_style_12_bold)
         self.label_greetings.pack(side="left")
         self.btn_logout = tk.Button(self.frame_top_right_block_first_row,
                                     text="Wyloguj",
@@ -145,6 +148,5 @@ class UserView(tk.Toplevel):
         self.tab_control.add(self.tab_raports, text='Raporty')
         self.tab_control.pack(expand=1, fill="both")
 
-        ttk.Label(self.tab_profile, text="Lorem ipsum dolor sit amet").grid(column=0, row=0, padx=30, pady=30)
-        ttk.Label(self.tab_meal_plan, text="Lorem ipsum dolor sit amet\
-        Lorem ipsum dolor sit amet").grid(column=0, row=0, padx=30, pady=30)
+        self.profile_view = ProfileView(self.tab_profile, self.shared_view, self.user)
+        self.profile_view.pack()

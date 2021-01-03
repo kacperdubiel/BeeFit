@@ -9,11 +9,16 @@ class SharedView:
         self.SMALL_PAD = 5
         self.NORMAL_PAD = 10
         self.BIG_PAD = 20
+        self.ICON_SIZE = 16
         self.font_style_10 = tk_font.Font(size=10)
         self.font_style_10_bold = tk_font.Font(size=10, weight='bold')
         self.font_style_12 = tk_font.Font(size=12)
+        self.font_style_12_bold = tk_font.Font(size=12, weight='bold')
         self.font_style_35_bold = tk_font.Font(size=35, weight='bold')
         self.btn_size = 15
+
+        self.style_notebook_tab = Style().configure('TNotebook.Tab', font=self.font_style_10_bold, padding=(15, 5))
+        self.style_notebook_tab = Style().configure('TToplevel', background="black")
 
         self.style_frame_black_bg = Style().configure("BlackBG.TFrame", background="black")
         self.style_frame_red_bg = Style().configure("RedBG.TFrame", background="red")

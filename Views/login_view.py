@@ -8,6 +8,7 @@ class LoginView(tk.Toplevel):
     def __init__(self, master, shared_view):
         tk.Toplevel.__init__(self, master)
         self.shared_view = shared_view
+        self.withdraw()
 
         self.protocol('WM_DELETE_WINDOW', self.master.destroy)
         self.title('BeeFit - Logowanie')
@@ -23,6 +24,7 @@ class LoginView(tk.Toplevel):
         self._create_buttons()
 
         center_window(self)
+        self.deiconify()
 
     def _create_login_frame(self):
         self.frame_login = ttk.Frame(self)

@@ -167,6 +167,18 @@ def select_user_weight(conn, user_login):
 
 
 @connect
+def select_user_weight_by_date(conn, user_login, date):
+    sql = """
+          SELECT * FROM Weights WHERE IdUser=? AND WeightDate=?
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (user_login, date))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
 def select_first_weight_before_date(conn, id_user, current_date):
     sql = """
           SELECT * FROM Weights WHERE IdUser=? AND WeightDate<=? ORDER BY WeightDate DESC LIMIT 1
@@ -320,4 +332,74 @@ def update_user_avatar(conn, user_id, new_avatar):
           """
     cursor = conn.cursor()
     cursor.execute(sql, (new_avatar, user_id))
+    conn.commit()
+
+
+@connect
+def update_user_gender(conn, user_id, new_gender):
+    sql = """
+          UPDATE Users SET Gender=? WHERE IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_gender, user_id))
+    conn.commit()
+
+
+@connect
+def update_user_weight_on_date(conn, user_id, date, new_weight):
+    sql = """
+          UPDATE Weights SET WeightValue=? WHERE IdUser=? AND WeightDate=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_weight, user_id, date))
+    conn.commit()
+
+
+@connect
+def update_user_height(conn, user_id, new_height):
+    sql = """
+          UPDATE Users SET Height=? WHERE IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_height, user_id))
+    conn.commit()
+
+
+@connect
+def update_user_age(conn, user_id, new_age):
+    sql = """
+          UPDATE Users SET Age=? WHERE IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_age, user_id))
+    conn.commit()
+
+
+@connect
+def update_user_physical_activity(conn, user_id, new_physical_activity):
+    sql = """
+          UPDATE Users SET PhysicalActivity=? WHERE IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_physical_activity, user_id))
+    conn.commit()
+
+
+@connect
+def update_user_goal(conn, user_id, new_goal):
+    sql = """
+          UPDATE Users SET Goal=? WHERE IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_goal, user_id))
+    conn.commit()
+
+
+@connect
+def update_user_gda_on_date(conn, user_id, date, new_gda):
+    sql = """
+          UPDATE GDAs SET GDAValue=? WHERE IdUser=? AND GDADate=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_gda, user_id, date))
     conn.commit()

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from Misc.config import DATE_FORMAT
+from Misc.config import DATE_FORMAT, GENDER_MALE, GENDER_FEMALE
 
 
 class MainModel:
@@ -10,9 +10,9 @@ class MainModel:
 
 def evaluate_gda(gender, weight, height, age, activity_val, goal_val):
     bmr_value = 0
-    if gender == "M":
+    if gender == GENDER_MALE:
         bmr_value = 66.47 + (13.7 * weight) + (5 * height) - (6.76 * age)
-    elif gender == "K":
+    elif gender == GENDER_FEMALE:
         bmr_value = 665.09 + (9.56 * weight) + (1.85 * height) - (4.67 * age)
 
     gda_value = bmr_value

@@ -1,5 +1,5 @@
 import io
-from Models.main_model import get_current_date
+from Models.main_model import get_current_date, evaluate_gda
 from PIL import Image
 
 
@@ -155,3 +155,13 @@ class UserModel:
         self.user['avatar'] = new_avatar
         self.avatar_settings()
         self.database_model.update_user_avatar(self.user['id_user'], new_avatar)
+
+    def update_weight(self):
+        self.user['weight'] = self.get_user_weight()
+
+    def eval_gda_from_current_data(self):
+        return evaluate_gda(self.user['gender'], float(self.user['weight']['weight_value']), float(self.user['height']),
+                            int(self.user['age']), int(self.user['physical_activity']), int(self.user['goal']))
+
+    def update_gda(self):
+        self.user['gda'] = self.get_user_gda()

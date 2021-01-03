@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
+
+from Misc.config import GENDER_MALE, GENDER_FEMALE, ACTIVITY_OPTIONS, GOAL_OPTIONS
 from Views.shared_view import center_window
 
 
@@ -8,6 +10,7 @@ class RegisterView(tk.Toplevel):
     def __init__(self, master, shared_view):
         tk.Toplevel.__init__(self, master)
         self.shared_view = shared_view
+        self.withdraw()
 
         self.title('BeeFit - Rejestracja')
         self.resizable(False, False)
@@ -19,6 +22,7 @@ class RegisterView(tk.Toplevel):
         self._create_buttons()
 
         center_window(self)
+        self.deiconify()
 
     def _create_register_frame(self):
         self.frame_register = Frame(self)
@@ -64,14 +68,17 @@ class RegisterView(tk.Toplevel):
 
         # Gender
         gender_frame = ttk.Frame(self.frame_user_data)
-        gender_frame.pack(pady=self.shared_view.SMALL_PAD)
+        gender_frame.pack(pady=(0, self.shared_view.SMALL_PAD))
+
+        label_gender = tk.Label(gender_frame, text="Wybierz płeć:", font=self.shared_view.font_style_12)
+        label_gender.pack()
 
         self.gender_value = tk.StringVar(value="M")
-        gender_radio_btn1 = Radiobutton(gender_frame, text="Mężczyzna", variable=self.gender_value, value="M",
+        gender_radio_btn1 = Radiobutton(gender_frame, text="Mężczyzna", variable=self.gender_value, value=GENDER_MALE,
                                         font=self.shared_view.font_style_12)
         gender_radio_btn1.pack(side='left')
 
-        gender_radio_btn2 = Radiobutton(gender_frame, text="Kobieta", variable=self.gender_value, value="K",
+        gender_radio_btn2 = Radiobutton(gender_frame, text="Kobieta", variable=self.gender_value, value=GENDER_FEMALE,
                                         font=self.shared_view.font_style_12)
         gender_radio_btn2.pack(side='left')
 
@@ -101,7 +108,7 @@ class RegisterView(tk.Toplevel):
                                   font=self.shared_view.font_style_12)
         label_activity.pack()
 
-        activity_options_list = ["1 - Bardzo niska", "2 - Niska", "3 - Średnia", "4 - Wysoka", "5 - Bardzo wysoka"]
+        activity_options_list = ACTIVITY_OPTIONS
         self.activity_value = tk.StringVar(value=activity_options_list[2])
         activity_option_menu = tk.OptionMenu(self.frame_user_data, self.activity_value, *activity_options_list)
         activity_option_menu.config(font=self.shared_view.font_style_12)
@@ -113,12 +120,12 @@ class RegisterView(tk.Toplevel):
                               font=self.shared_view.font_style_12)
         label_goal.pack()
 
-        goal_options_list = ["1 - Zmniejszyć wagę", "2 - Utrzymać aktualną wagę", "3 - Zwiększyć wagę"]
+        goal_options_list = GOAL_OPTIONS
         self.goal_value = tk.StringVar(value=goal_options_list[1])
-        activity_option_menu = tk.OptionMenu(self.frame_user_data, self.goal_value, *goal_options_list)
-        activity_option_menu.config(font=self.shared_view.font_style_12)
-        activity_option_menu.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD,
-                                  pady=(self.shared_view.SMALL_PAD, self.shared_view.NORMAL_PAD))
+        goal_option_menu = tk.OptionMenu(self.frame_user_data, self.goal_value, *goal_options_list)
+        goal_option_menu.config(font=self.shared_view.font_style_12)
+        goal_option_menu.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD,
+                              pady=(self.shared_view.SMALL_PAD, self.shared_view.NORMAL_PAD))
 
     def _create_buttons(self):
         self.btn_back = tk.Button(self.frame_register,
