@@ -8,7 +8,7 @@ from Views.profile_view import ProfileView
 from Views.shared_view import center_window
 
 
-class UserView(tk.Toplevel):
+class LoggedUserView(tk.Toplevel):
     def __init__(self, master, shared_view, user):
         tk.Toplevel.__init__(self, master)
         self.shared_view = shared_view

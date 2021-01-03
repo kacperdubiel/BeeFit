@@ -6,7 +6,7 @@ from Misc.config import DATE_FORMAT, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_
 from Views.profile_view import SetGenderWindow, SetHeightWindow, SetAgeWindow, SetWeightWindow, SetActivityWindow, \
     SetGoalWindow, EvaluateGDAWindow
 from Views.shared_view import show_errorbox
-from Views.user_view import UserView
+from Views.logged_user_view import LoggedUserView
 from Models.user_model import UserModel
 from Models.main_model import get_current_date, format_date, convert_to_binary_data
 import Controllers.main_controller as main_controller
@@ -19,15 +19,15 @@ class UserController:
         self.shared_view = shared_view
 
         self.user_model = UserModel(user, self.database_model)
-        self.user_view = UserView(master, self.shared_view, self.user_model.user)
+        self.logged_user_view = LoggedUserView(master, self.shared_view, self.user_model.user)
 
-        self.user_view.btn_change_avatar.config(command=self.change_user_avatar)
+        self.logged_user_view.btn_change_avatar.config(command=self.change_user_avatar)
 
-        self.user_view.btn_set_to_today.config(command=self.set_to_todays_date)
-        self.user_view.btn_prev_date.config(command=self.set_to_prev_day_date)
-        self.user_view.btn_next_date.config(command=self.set_to_next_day_date)
+        self.logged_user_view.btn_set_to_today.config(command=self.set_to_todays_date)
+        self.logged_user_view.btn_prev_date.config(command=self.set_to_prev_day_date)
+        self.logged_user_view.btn_next_date.config(command=self.set_to_next_day_date)
 
-        self.profile_view = self.user_view.profile_view
+        self.profile_view = self.logged_user_view.profile_view
 
         self.popup_window = None
         self.profile_view.btn_set_gender.config(command=lambda: self.open_popup_window('gender'))
@@ -44,7 +44,7 @@ class UserController:
         if new_avatar_filename:
             new_avatar = convert_to_binary_data(new_avatar_filename)
             self.user_model.set_user_avatar(new_avatar)
-            self.user_view.update_user_avatar()
+            self.logged_user_view.update_user_avatar()
 
     def set_to_todays_date(self):
         new_date = get_current_date()
@@ -62,7 +62,7 @@ class UserController:
 
     def set_current_date(self, new_date):
         self.user_model.set_current_date(new_date)
-        self.user_view.update_user_status_view()
+        self.logged_user_view.update_user_status_view()
 
     def close_popup_window(self):
         if self.popup_window is not None:
@@ -238,6 +238,6 @@ class UserController:
             self.user_model.update_gda()
             self.profile_view.update_gda()
             self.user_model.set_current_date(self.user_model.user['current_date'])
-            self.user_view.update_user_status_view()
+            self.logged_user_view.update_user_status_view()
 
         self.close_popup_window()

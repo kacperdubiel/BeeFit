@@ -162,18 +162,17 @@ class AccountController:
         # Create UserController with UserView
         if self.user_controller is None:
             self.user_controller = UserController(self.master, self.database_model, self.shared_view, user)
-            self.user_controller.user_view.btn_logout.config(command=self.logout)
-            self.user_controller.user_view.focus_force()
+            self.user_controller.logged_user_view.btn_logout.config(command=self.logout)
+            self.user_controller.logged_user_view.focus_force()
         else:
             self.logout()
 
     def logout(self):
         # Clear UserView and UserController then show login window.
-        if self.user_controller.user_view:
-            self.user_controller.user_view.destroy()
+        if self.user_controller.logged_user_view:
+            self.user_controller.logged_user_view.destroy()
 
         if self.user_controller is not None:
             self.user_controller = None
 
         self.login_view.deiconify()
-
