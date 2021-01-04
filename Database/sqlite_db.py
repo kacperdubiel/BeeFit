@@ -116,6 +116,17 @@ def insert_gda(conn, user_id, gda_value, gda_date):
     query(conn, sql, data_tuple)
 
 
+@connect
+def insert_consumed_product(conn, product_id, user_id, date, grammage):
+    sql = """
+          INSERT INTO ConsumedProducts (IdProduct,IdUser,ConsumptionDate,ProductGrammage)
+          VALUES (?,?,?,?) 
+          """
+    data_tuple = (product_id, user_id, date, grammage)
+
+    query(conn, sql, data_tuple)
+
+
 # --- SELECT ---
 
 @connect
@@ -402,4 +413,25 @@ def update_user_gda_on_date(conn, user_id, date, new_gda):
           """
     cursor = conn.cursor()
     cursor.execute(sql, (new_gda, user_id, date))
+    conn.commit()
+
+
+@connect
+def update_consumed_product(conn, id_consumed_product, new_product_id, new_grammage):
+    sql = """
+          UPDATE ConsumedProducts SET IdProduct=?,ProductGrammage=? WHERE IdConsumedProduct=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_product_id, new_grammage, id_consumed_product))
+    conn.commit()
+
+
+# --- DELETE ---
+
+def delete_consumed_product_by_id(conn, id_user, id_consumed_product):
+    sql = """
+              DELETE FROM ConsumedProducts WHERE IdConsumedProduct=? AND IdUser=?;
+              """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_consumed_product, id_user))
     conn.commit()

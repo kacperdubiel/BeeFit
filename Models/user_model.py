@@ -24,6 +24,9 @@ class UserModel:
         self.user['dishes_ids'] = []
         self.user['dishes'] = self.get_user_dishes()
 
+        self.user['consumed_products'] = self.get_user_consumed_products()
+        self.user['consumed_dishes'] = self.get_user_consumed_dishes()
+
         self.user['current_date_trainings'] = self.get_user_current_date_trainings()
 
         self.user['calories_to_consume'] = self.get_calories_to_consume()
@@ -53,22 +56,8 @@ class UserModel:
         return found_gda
 
     def avatar_settings(self):
-        self.user['avatar'] = self.get_image_from_bytes(self.user['avatar'])
-        self.user['avatar_width'], self.user['avatar_height'] = self.scale_avatar()
+        self.user['avatar_width'], self.user['avatar_height'] = scale_image(self.user['avatar'], self.AVATAR_MAX_SIZE)
         self.user['avatar'] = self.user['avatar'].resize((self.user['avatar_width'], self.user['avatar_height']))
-
-    @staticmethod
-    def get_image_from_bytes(bytes_img):
-        return Image.open(io.BytesIO(bytes_img))
-
-    def scale_avatar(self):
-        avatar_width, avatar_height = self.user['avatar'].size
-        scale_from_width = avatar_height / self.AVATAR_MAX_SIZE
-        scale_from_height = avatar_width / self.AVATAR_MAX_SIZE
-        scale = max(scale_from_width, scale_from_height)
-        new_avatar_width = int(avatar_width / scale)
-        new_avatar_height = int(avatar_height / scale)
-        return new_avatar_width, new_avatar_height
 
     def get_user_products(self):
         user_products = self.database_model.select_user_products(self.user['id_user'])
@@ -89,6 +78,20 @@ class UserModel:
             self.user['dishes_ids'].append(dish["id_dish"])
 
         return dishes
+
+    def get_user_consumed_products(self):
+        return self.database_model.select_user_consumed_products_at_date(self.user['id_user'],
+                                                                         self.user['current_date'])
+
+    def get_user_consumed_dishes(self):
+        consumed_dishes = self.database_model.select_user_consumed_dishes_at_date(self.user['id_user'],
+                                                                                  self.user['current_date'])
+        for c_dish in consumed_dishes:
+            id_dish = c_dish['id_dish']
+            dish_calories_per_100g = self.user['dishes'][f'{id_dish}']['calories']
+            c_dish['calories'] = int(c_dish['dish_grammage'] * float(dish_calories_per_100g) / 100)
+
+        return consumed_dishes
 
     def get_user_current_date_trainings(self):
         current_trainings = self.database_model.select_user_trainings_at_date(self.user['id_user'],
@@ -111,17 +114,12 @@ class UserModel:
         calories_consumed = 0
 
         # Products calories
-        consumed_products = self.database_model.select_user_consumed_products_at_date(self.user['id_user'],
-                                                                                      self.user['current_date'])
-        for c_product in consumed_products:
-            calories_consumed += int((c_product['calories'] * c_product['product_grammage']) / 100)
+        for c_product in self.user['consumed_products']:
+            calories_consumed += c_product['calories']
 
         # Dishes calories
-        consumed_dishes = self.database_model.select_user_consumed_dishes_at_date(self.user['id_user'],
-                                                                                  self.user['current_date'])
-        for c_dish in consumed_dishes:
-            dish_calories = self.user['dishes'][f'{c_dish["id_dish"]}']['calories']
-            calories_consumed += int((dish_calories * c_dish['dish_grammage']) / 100)
+        for c_dish in self.user['consumed_dishes']:
+            calories_consumed += self.user['dishes'][f'{c_dish["id_dish"]}']['calories']
 
         return calories_consumed
 
@@ -143,6 +141,9 @@ class UserModel:
         self.user['current_date_weight'] = self.get_user_current_date_weight()
         self.user['current_date_gda'] = self.get_user_current_date_gda()
 
+        self.user['consumed_products'] = self.get_user_consumed_products()
+        self.user['consumed_dishes'] = self.get_user_consumed_dishes()
+
         self.user['current_date_trainings'] = self.get_user_current_date_trainings()
 
         self.user['calories_to_consume'] = self.get_calories_to_consume()
@@ -152,9 +153,9 @@ class UserModel:
         self.user['progressbar_percent'] = self.get_progressbar_percent()
 
     def set_user_avatar(self, new_avatar):
-        self.user['avatar'] = new_avatar
-        self.avatar_settings()
         self.database_model.update_user_avatar(self.user['id_user'], new_avatar)
+        self.user['avatar'] = Image.open(io.BytesIO(new_avatar))
+        self.avatar_settings()
 
     def update_weight(self):
         self.user['weight'] = self.get_user_weight()
@@ -165,3 +166,18 @@ class UserModel:
 
     def update_gda(self):
         self.user['gda'] = self.get_user_gda()
+
+    def update_consumed_products(self):
+        self.user['consumed_products'] = self.get_user_consumed_products()
+
+
+# --- STATIC METHODS ---
+
+def scale_image(img, max_size):
+    img_width, img_height = img.size
+    scale_from_width = img_height / max_size
+    scale_from_height = img_width / max_size
+    scale = max(scale_from_width, scale_from_height)
+    new_img_width = int(img_width / scale)
+    new_img_height = int(img_height / scale)
+    return new_img_width, new_img_height

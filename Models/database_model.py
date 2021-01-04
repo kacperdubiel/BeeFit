@@ -2,6 +2,8 @@ from Database import sqlite_db
 import json
 from Misc.config import TRAINING_TYPES_JSON_PATH, DB_NAME, DB_DIR
 import os.path
+from PIL import Image
+import io
 
 
 class DatabaseModel:
@@ -43,15 +45,22 @@ class DatabaseModel:
     def insert_gda(self, user_id, gda_value, gda_date):
         sqlite_db.insert_gda(self.conn, user_id, gda_value, gda_date)
 
+    def insert_consumed_product(self, product_id, user_id, date, grammage):
+        sqlite_db.insert_consumed_product(self.conn, product_id, user_id, date, grammage)
+
     # --- SELECT ---
 
     def select_user_by_login(self, login):
         row = sqlite_db.select_user_by_login(self.conn, login)
-        return self.user_row_to_user_dict(row)
+        user = self.user_row_to_user_dict(row)
+        user['avatar'] = self.get_image_from_bytes(user['avatar'])
+        return user
 
     def select_user_by_login_and_password(self, login, password):
         row = sqlite_db.select_user_by_login_and_password(self.conn, login, password)
-        return self.user_row_to_user_dict(row)
+        user = self.user_row_to_user_dict(row)
+        user['avatar'] = self.get_image_from_bytes(user['avatar'])
+        return user
 
     def select_user_by_email(self, email):
         return sqlite_db.select_user_by_email(self.conn, email)
@@ -89,7 +98,9 @@ class DatabaseModel:
 
         products = list()
         for row in rows:
-            products.append(self.product_row_to_product_dict(row))
+            prod = self.product_row_to_product_dict(row)
+            prod['image'] = self.get_image_from_bytes(prod['image'])
+            products.append(prod)
         return products
 
     def select_user_dishes(self, id_user):
@@ -98,13 +109,17 @@ class DatabaseModel:
         dishes = list()
         for row in rows:
             dish = self.dish_row_to_dish_dict(row)
+            dish['image'] = self.get_image_from_bytes(dish['image'])
+
             dish['products'] = []
             dishes_products = sqlite_db.select_dishes_products(self.conn, dish['id_dish'])
             dish_calories = 0
-            for product in dishes_products:
-                prod_dict = self.dishes_products_row_to_dishes_products_dict(product)
-                dish_calories += int((prod_dict['calories'] * prod_dict['product_grammage']) / 100)
-                dish['products'].append(prod_dict)
+            for d_product in dishes_products:
+                d_prod_dict = self.dishes_products_row_to_dishes_products_dict(d_product)
+                d_prod_dict['image'] = self.get_image_from_bytes(d_prod_dict['image'])
+
+                dish_calories += int((d_prod_dict['calories'] * d_prod_dict['product_grammage']) / 100)
+                dish['products'].append(d_prod_dict)
 
             dish['calories'] = dish_calories
             dishes.append(dish)
@@ -123,7 +138,10 @@ class DatabaseModel:
 
         consumed_products = list()
         for row in rows:
-            consumed_products.append(self.consumed_prod_row_to_consumed_prod_dict(row))
+            c_prod = self.consumed_prod_row_to_consumed_prod_dict(row)
+            c_prod['image'] = self.get_image_from_bytes(c_prod['image'])
+            c_prod['calories'] = int(float(c_prod['calories']) / 100 * c_prod['product_grammage'])
+            consumed_products.append(c_prod)
         return consumed_products
 
     def select_user_consumed_dishes_at_date(self, id_user, current_date):
@@ -131,7 +149,9 @@ class DatabaseModel:
 
         consumed_dishes = list()
         for row in rows:
-            consumed_dishes.append(self.consumed_dish_row_to_consumed_dish_dict(row))
+            c_dish = self.consumed_dish_row_to_consumed_dish_dict(row)
+            c_dish['image'] = self.get_image_from_bytes(c_dish['image'])
+            consumed_dishes.append(c_dish)
         return consumed_dishes
 
     # --- UPDATE ---
@@ -160,7 +180,19 @@ class DatabaseModel:
     def update_user_gda_on_date(self, id_user, date, new_gda):
         sqlite_db.update_user_gda_on_date(self.conn, id_user, date, new_gda)
 
+    def update_consumed_product(self, id_consumed_product, new_product_id, new_grammage):
+        sqlite_db.update_consumed_product(self.conn, id_consumed_product, new_product_id, new_grammage)
+
+    # --- DELETE ---
+
+    def delete_consumed_product_by_id(self, id_user, id_consumed_product):
+        sqlite_db.delete_consumed_product_by_id(self.conn, id_user, id_consumed_product)
+
     # --- MISC ---
+
+    @staticmethod
+    def get_image_from_bytes(bytes_img):
+        return Image.open(io.BytesIO(bytes_img))
 
     @staticmethod
     def user_row_to_user_dict(row):
@@ -224,7 +256,7 @@ class DatabaseModel:
     @staticmethod
     def dishes_products_row_to_dishes_products_dict(row):
         if row is not None:
-            dish = {
+            dish_product = {
                 'id_dishes_products': row[0],
                 'id_dish': row[1],
                 'id_product': row[2],
@@ -233,7 +265,7 @@ class DatabaseModel:
                 'calories': row[5],
                 'image': row[6]
             }
-            return dish
+            return dish_product
         else:
             return None
 

@@ -4,6 +4,7 @@ from tkinter import *
 
 from PIL import ImageTk
 
+from Views.meal_plan_view import MealPlanView
 from Views.profile_view import ProfileView
 from Views.shared_view import center_window
 
@@ -150,3 +151,6 @@ class LoggedUserView(tk.Toplevel):
 
         self.profile_view = ProfileView(self.tab_profile, self.shared_view, self.user)
         self.profile_view.pack()
+
+        self.meal_plan_view = MealPlanView(self.tab_meal_plan, self.shared_view, self.user)
+        self.meal_plan_view.pack()
