@@ -21,6 +21,8 @@ class UserModel:
 
         self.user['products_ids'] = []
         self.user['products'] = self.get_user_products()
+        self.user['selected_products_ids'] = self.get_user_selected_products_ids()
+
         self.user['dishes_ids'] = []
         self.user['dishes'] = self.get_user_dishes()
 
@@ -68,6 +70,16 @@ class UserModel:
             self.user['products_ids'].append(product["id_product"])
 
         return products
+
+    def get_user_selected_products_ids(self, str_to_look_for=""):
+        found_ids = list()
+        for prod_id in self.user['products_ids']:
+            product_name = self.user['products'][f'{prod_id}']['product_name']
+            str_to_look_for = str_to_look_for.lower()
+            product_name = product_name.lower()
+            if str_to_look_for in product_name:
+                found_ids.append(prod_id)
+        return found_ids
 
     def get_user_dishes(self):
         user_dishes = self.database_model.select_user_dishes(self.user['id_user'])
@@ -169,6 +181,9 @@ class UserModel:
 
     def update_consumed_products(self):
         self.user['consumed_products'] = self.get_user_consumed_products()
+
+    def update_selected_products_ids(self, str_to_look_for):
+        self.user['selected_products_ids'] = self.get_user_selected_products_ids(str_to_look_for)
 
 
 # --- STATIC METHODS ---

@@ -144,7 +144,6 @@ class MealPlanView(ttk.Frame):
         pass
 
     def update_consumed_products(self):
-        # forget and destroy frame
         self.frame_products.pack_forget()
         self.frame_products.destroy()
         self._fill_container_with_c_products()
@@ -207,13 +206,29 @@ class AddConsumedProductWindow(tk.Toplevel):
         self.frame_main = ttk.Frame(self)
         self.frame_main.pack(padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
 
+        self._create_search_box()
         self._create_container()
-        self._fill_container_with_products()
+        self._fill_container_with_products(self.user_prods_ids)
         self._create_grammage_entry()
         self._create_buttons()
 
         center_window(self)
         self.deiconify()
+
+    def _create_search_box(self):
+        self.label_frame_search = ttk.LabelFrame(self.frame_main, text="Wyszukaj produkt:")
+        self.label_frame_search.pack(fill=tk.BOTH, expand=1, pady=(0, self.shared_view.NORMAL_PAD))
+
+        self.frame_search = ttk.Frame(self.label_frame_search)
+        self.frame_search.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
+
+        self.entry_search = tk.Entry(self.frame_search, font=self.shared_view.font_style_12)
+        self.entry_search.pack(fill=tk.BOTH, side='left', expand=1, padx=self.shared_view.NORMAL_PAD,
+                               pady=self.shared_view.NORMAL_PAD)
+
+        self.btn_search = tk.Button(self.frame_search, text="Szukaj", width=self.shared_view.btn_size,
+                                    font=self.shared_view.font_style_12)
+        self.btn_search.pack(side='right')
 
     def _create_container(self):
         self.frame_container_products = Frame(self.frame_main, relief="groove", bd=2)
@@ -236,7 +251,7 @@ class AddConsumedProductWindow(tk.Toplevel):
         frame_sizer = Frame(self.frame_main, width=540)
         frame_sizer.pack()
 
-    def _fill_container_with_products(self):
+    def _fill_container_with_products(self, products_ids):
         self.frame_products = Frame(self.frame_scrollable)
         self.frame_products.pack(fill="both", expand=1)
 
@@ -248,7 +263,7 @@ class AddConsumedProductWindow(tk.Toplevel):
 
         self.product_selected = tk.IntVar(value=self.default_radio)
         index = 0
-        for product_id in self.user_prods_ids:
+        for product_id in products_ids:
             frame_product = Frame(self.frame_products, relief="ridge", bd=2)
             frame_product.pack(fill="both", padx=self.shared_view.VERY_SMALL_PAD, pady=self.shared_view.VERY_SMALL_PAD)
             frame_product.focus()
@@ -320,3 +335,8 @@ class AddConsumedProductWindow(tk.Toplevel):
         self.btn_add_prod = tk.Button(self.frame_buttons, text="Wybierz", width=self.shared_view.btn_size,
                                       font=self.shared_view.font_style_12)
         self.btn_add_prod.pack(side='left', pady=(self.shared_view.NORMAL_PAD, 0))
+
+    def update_products_list(self, products_ids):
+        self.frame_products.pack_forget()
+        self.frame_products.destroy()
+        self._fill_container_with_products(products_ids)

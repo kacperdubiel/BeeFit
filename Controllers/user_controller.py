@@ -61,6 +61,7 @@ class UserController:
         self.user_model.set_current_date(new_date)
         self.logged_user_view.update_user_status_view()
         self.meal_plan_view.update_consumed_products()
+        self.close_popup_window()
 
     def close_popup_window(self):
         if self.popup_window is not None:
@@ -278,11 +279,13 @@ class UserController:
                                                                  self.user_model.user['products'],
                                                                  self.user_model.user['products_ids'], radio_index,
                                                                  grammage)
+                    self.popup_window.btn_search.config(command=self.search_product)
                     self.popup_window.btn_add_prod.config(command=lambda: self.edit_consumed_product(c_prod_index))
             if window_type == "add_prod":
                 self.popup_window = AddConsumedProductWindow(self.master, self.shared_view,
                                                              self.user_model.user['products'],
                                                              self.user_model.user['products_ids'])
+                self.popup_window.btn_search.config(command=self.search_product)
                 self.popup_window.btn_add_prod.config(command=self.add_consumed_product)
 
             if self.popup_window is not None:
@@ -301,10 +304,15 @@ class UserController:
 
         self.close_popup_window()
 
+    def search_product(self):
+        str_to_look_for = self.popup_window.entry_search.get()
+        self.user_model.update_selected_products_ids(str_to_look_for)
+        self.popup_window.update_products_list(self.user_model.user['selected_products_ids'])
+
     def edit_consumed_product(self, c_prod_index):
         consumed_product_id = self.user_model.user['consumed_products'][c_prod_index]['id_consumed_product']
         index = self.popup_window.product_selected.get()
-        new_product_id = self.user_model.user['products_ids'][index]
+        new_product_id = self.user_model.user['selected_products_ids'][index]
         new_grammage = self.popup_window.entry_grammage.get()
 
         if not self.correct_grammage_value(new_grammage):
@@ -317,10 +325,10 @@ class UserController:
         self.close_popup_window()
 
     def add_consumed_product(self):
-        if len(self.user_model.user['products_ids']):
+        if len(self.user_model.user['selected_products_ids']):
             index = self.popup_window.product_selected.get()
 
-            product_id = self.user_model.user['products_ids'][index]
+            product_id = self.user_model.user['selected_products_ids'][index]
             grammage = self.popup_window.entry_grammage.get()
 
             if not self.correct_grammage_value(grammage):
