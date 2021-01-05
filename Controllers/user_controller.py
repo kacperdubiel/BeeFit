@@ -1,16 +1,20 @@
+import os
 from datetime import datetime, timedelta
 from tkinter import filedialog
-import os
+
+import Controllers.main_controller as main_controller
 from Misc.config import DATE_FORMAT, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_MAX, \
-    AGE_MIN, AGE_MAX, ACTIVITY_VALUE_MIN, ACTIVITY_VALUE_MAX, GOAL_VALUE_MIN, GOAL_VALUE_MAX, GRAMMAGE_MIN, GRAMMAGE_MAX
-from Views.meal_plan_view import DeleteConsumedProductWindow, AddConsumedProductWindow
+    AGE_MIN, AGE_MAX, ACTIVITY_VALUE_MIN, ACTIVITY_VALUE_MAX, GOAL_VALUE_MIN, GOAL_VALUE_MAX, GRAMMAGE_MIN, \
+    GRAMMAGE_MAX, FOOD_NAME_LENGTH_MIN, FOOD_NAME_LENGTH_MAX, CALORIES_MIN, CALORIES_MAX
+from Models.main_model import get_current_date, format_date, convert_to_binary_data
+from Models.user_model import UserModel
+from Views.logged_user_view import LoggedUserView
+from Views.meal_plan_view import DeleteConsumedProductWindow, AddConsumedProductWindow, DeleteConsumedDishWindow, \
+    AddConsumedDishWindow
 from Views.profile_view import SetGenderWindow, SetHeightWindow, SetAgeWindow, SetWeightWindow, SetActivityWindow, \
     SetGoalWindow, EvaluateGDAWindow
 from Views.shared_view import show_errorbox
-from Views.logged_user_view import LoggedUserView
-from Models.user_model import UserModel
-from Models.main_model import get_current_date, format_date, convert_to_binary_data
-import Controllers.main_controller as main_controller
+from Views.user_products import DeleteProductWindow, AddProductWindow
 
 
 class UserController:
@@ -30,10 +34,12 @@ class UserController:
 
         self.profile_view = self.logged_user_view.profile_view
         self.meal_plan_view = self.logged_user_view.meal_plan_view
+        self.user_products_view = self.logged_user_view.user_products_view
 
         self.popup_window = None
         self.configure_profile_view_buttons()
         self.configure_meal_plan_view_buttons()
+        self.configure_user_products_view_buttons()
 
     def change_user_avatar(self):
         new_avatar_filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Wybierz obrazek",
@@ -59,14 +65,52 @@ class UserController:
 
     def set_current_date(self, new_date):
         self.user_model.set_current_date(new_date)
-        self.logged_user_view.update_user_status_view()
         self.meal_plan_view.update_consumed_products()
+        self.meal_plan_view.update_consumed_dishes()
+
+        self.logged_user_view.update_user_status_view()
         self.close_popup_window()
 
     def close_popup_window(self):
         if self.popup_window is not None:
             self.popup_window.destroy()
             self.popup_window = None
+
+    @staticmethod
+    def correct_grammage_value(grammage):
+        if not main_controller.is_int(grammage):
+            show_errorbox("Błędna waga", f"Waga musi być liczbą całkowitą!")
+            return False
+
+        grammage = int(grammage)
+        if grammage < GRAMMAGE_MIN or grammage > GRAMMAGE_MAX:
+            show_errorbox("Błędna waga", f"Waga musi być z przedziału [{GRAMMAGE_MIN},{GRAMMAGE_MAX}]!")
+            return False
+
+        return True
+
+    @staticmethod
+    def correct_name(name):
+        if len(name) < FOOD_NAME_LENGTH_MIN or len(name) > FOOD_NAME_LENGTH_MAX:
+            show_errorbox("Błędna nazwa",
+                          f"Nazwa musi mieć od {FOOD_NAME_LENGTH_MIN} do {FOOD_NAME_LENGTH_MAX} znaków!")
+            return False
+
+        return True
+
+    @staticmethod
+    def correct_calories_value(calories):
+        if not main_controller.is_int(calories):
+            show_errorbox("Błędna liczba kalorii", f"Liczba kalorii musi być liczbą całkowitą!")
+            return False
+
+        calories = int(calories)
+        if calories < CALORIES_MIN or calories > CALORIES_MAX:
+            show_errorbox("Błędna liczba kalorii",
+                          f"Liczba kalorii musi być z przedziału [{CALORIES_MIN},{CALORIES_MAX}]!")
+            return False
+
+        return True
 
     # --- PROFILE VIEW ---
 
@@ -261,6 +305,10 @@ class UserController:
         self.meal_plan_view.btn_edit_prod.config(command=lambda: self.open_meal_plan_popup_window('edit_prod'))
         self.meal_plan_view.btn_add_prod.config(command=lambda: self.open_meal_plan_popup_window('add_prod'))
 
+        self.meal_plan_view.btn_delete_dish.config(command=lambda: self.open_meal_plan_popup_window('delete_dish'))
+        self.meal_plan_view.btn_edit_dish.config(command=lambda: self.open_meal_plan_popup_window('edit_dish'))
+        self.meal_plan_view.btn_add_dish.config(command=lambda: self.open_meal_plan_popup_window('add_dish'))
+
     def open_meal_plan_popup_window(self, window_type):
         if self.popup_window is None:
             if window_type == "delete_prod":
@@ -269,7 +317,7 @@ class UserController:
                     self.popup_window = DeleteConsumedProductWindow(self.master, self.shared_view,
                                                                     self.user_model.user['consumed_products'][cprod_id])
                     self.popup_window.btn_delete_prod.config(command=lambda: self.delete_consumed_product(cprod_id))
-            if window_type == "edit_prod":
+            elif window_type == "edit_prod":
                 if len(self.user_model.user['consumed_products']) > 0:
                     c_prod_index = self.meal_plan_view.product_selected.get()
                     product_to_edit = self.user_model.user['consumed_products'][c_prod_index]
@@ -279,14 +327,38 @@ class UserController:
                                                                  self.user_model.user['products'],
                                                                  self.user_model.user['products_ids'], radio_index,
                                                                  grammage)
-                    self.popup_window.btn_search.config(command=self.search_product)
+                    self.popup_window.btn_search.config(command=self.search_product_popup)
                     self.popup_window.btn_add_prod.config(command=lambda: self.edit_consumed_product(c_prod_index))
-            if window_type == "add_prod":
+            elif window_type == "add_prod":
                 self.popup_window = AddConsumedProductWindow(self.master, self.shared_view,
                                                              self.user_model.user['products'],
                                                              self.user_model.user['products_ids'])
-                self.popup_window.btn_search.config(command=self.search_product)
+                self.popup_window.btn_search.config(command=self.search_product_popup)
                 self.popup_window.btn_add_prod.config(command=self.add_consumed_product)
+            elif window_type == "delete_dish":
+                if len(self.user_model.user['consumed_dishes']) > 0:
+                    cdish_id = self.meal_plan_view.dish_selected.get()
+                    self.popup_window = DeleteConsumedDishWindow(self.master, self.shared_view,
+                                                                 self.user_model.user['consumed_dishes'][cdish_id])
+                    self.popup_window.btn_delete_dish.config(command=lambda: self.delete_consumed_dish(cdish_id))
+            elif window_type == "edit_dish":
+                if len(self.user_model.user['consumed_dishes']) > 0:
+                    c_dish_index = self.meal_plan_view.dish_selected.get()
+                    dish_to_edit = self.user_model.user['consumed_dishes'][c_dish_index]
+                    radio_index = self.user_model.user['dishes_ids'].index(dish_to_edit['id_dish'])
+                    grammage = self.user_model.user['consumed_dishes'][c_dish_index]['dish_grammage']
+                    self.popup_window = AddConsumedDishWindow(self.master, self.shared_view,
+                                                              self.user_model.user['dishes'],
+                                                              self.user_model.user['dishes_ids'], radio_index,
+                                                              grammage)
+                    self.popup_window.btn_search.config(command=self.search_dish_popup)
+                    self.popup_window.btn_add_dish.config(command=lambda: self.edit_consumed_dish(c_dish_index))
+            elif window_type == "add_dish":
+                self.popup_window = AddConsumedDishWindow(self.master, self.shared_view,
+                                                          self.user_model.user['dishes'],
+                                                          self.user_model.user['dishes_ids'])
+                self.popup_window.btn_search.config(command=self.search_dish_popup)
+                self.popup_window.btn_add_dish.config(command=self.add_consumed_dish)
 
             if self.popup_window is not None:
                 self.popup_window.protocol('WM_DELETE_WINDOW', self.close_popup_window)
@@ -304,7 +376,7 @@ class UserController:
 
         self.close_popup_window()
 
-    def search_product(self):
+    def search_product_popup(self):
         str_to_look_for = self.popup_window.entry_search.get()
         self.user_model.update_selected_products_ids(str_to_look_for)
         self.popup_window.update_products_list(self.user_model.user['selected_products_ids'])
@@ -346,16 +418,165 @@ class UserController:
         self.meal_plan_view.update_consumed_products()
         self.logged_user_view.update_user_status_view()
 
-    @staticmethod
-    def correct_grammage_value(grammage):
-        if not main_controller.is_int(grammage):
-            show_errorbox("Błędna waga produktu", f"Waga produktu musi być liczbą całkowitą!")
-            return False
+    def delete_consumed_dish(self, c_dish_index):
+        consumed_dish_id = self.user_model.user['consumed_dishes'][c_dish_index]['id_consumed_dish']
+        self.database_model.delete_consumed_dish_by_id(self.user_model.user['id_user'], consumed_dish_id)
 
-        grammage = int(grammage)
-        if grammage < GRAMMAGE_MIN or grammage > GRAMMAGE_MAX:
-            show_errorbox("Błędna waga produktu", f"Waga produktu musi być z przedziału "
-                                                  f"[{GRAMMAGE_MIN},{GRAMMAGE_MAX}]!")
-            return False
+        self.update_consumed_dishes()
 
-        return True
+        self.close_popup_window()
+
+    def search_dish_popup(self):
+        str_to_look_for = self.popup_window.entry_search.get()
+        self.user_model.update_selected_dishes_ids(str_to_look_for)
+        self.popup_window.update_dishes_list(self.user_model.user['selected_dishes_ids'])
+
+    def edit_consumed_dish(self, c_dish_index):
+        consumed_dish_id = self.user_model.user['consumed_dishes'][c_dish_index]['id_consumed_dish']
+        index = self.popup_window.dish_selected.get()
+        new_dish_id = self.user_model.user['selected_dishes_ids'][index]
+        new_grammage = self.popup_window.entry_grammage.get()
+
+        if not self.correct_grammage_value(new_grammage):
+            return
+
+        self.database_model.update_consumed_dish(consumed_dish_id, new_dish_id, new_grammage)
+
+        self.update_consumed_dishes()
+
+        self.close_popup_window()
+
+    def add_consumed_dish(self):
+        if len(self.user_model.user['selected_dishes_ids']):
+            index = self.popup_window.dish_selected.get()
+
+            dish_id = self.user_model.user['selected_dishes_ids'][index]
+            grammage = self.popup_window.entry_grammage.get()
+
+            if not self.correct_grammage_value(grammage):
+                return
+
+            self.database_model.insert_consumed_dish(dish_id, self.user_model.user['id_user'],
+                                                     self.user_model.user['current_date'], grammage)
+
+            self.update_consumed_dishes()
+
+        self.close_popup_window()
+
+    def update_consumed_dishes(self):
+        self.user_model.set_current_date(self.user_model.user['current_date'])
+        self.meal_plan_view.update_consumed_dishes()
+        self.logged_user_view.update_user_status_view()
+
+    # --- USER PRODUCTS VIEW ---
+
+    def configure_user_products_view_buttons(self):
+        self.user_products_view.btn_delete_prod.config(
+            command=lambda: self.open_user_products_popup_window('delete_prod'))
+        self.user_products_view.btn_edit_prod.config(command=lambda: self.open_user_products_popup_window('edit_prod'))
+        self.user_products_view.btn_add_prod.config(command=lambda: self.open_user_products_popup_window('add_prod'))
+        self.user_products_view.btn_search.config(command=self.search_product)
+
+    def open_user_products_popup_window(self, window_type):
+        if self.popup_window is None:
+            if window_type == "delete_prod":
+                if len(self.user_model.user['selected_products_ids']) > 0:
+                    prod_index = self.user_products_view.product_selected.get()
+                    prod_id = self.user_model.user['selected_products_ids'][prod_index]
+                    product = self.user_model.user['products'][f'{prod_id}']
+                    self.popup_window = DeleteProductWindow(self.master, self.shared_view, product)
+                    self.popup_window.btn_delete_prod.config(command=lambda: self.delete_product(prod_id))
+            elif window_type == "edit_prod":
+                if len(self.user_model.user['selected_products_ids']) > 0:
+                    prod_index = self.user_products_view.product_selected.get()
+                    prod_id = self.user_model.user['selected_products_ids'][prod_index]
+                    product_to_edit = self.user_model.user['products'][f'{prod_id}']
+
+                    product_name = product_to_edit['product_name']
+                    product_calories = product_to_edit['calories']
+                    product_image = product_to_edit['image']
+
+                    self.popup_window = AddProductWindow(self.master, self.shared_view, product_name, product_calories,
+                                                         product_image)
+                    self.popup_window.btn_add_img.config(command=self.change_product_image)
+                    self.popup_window.btn_add_prod.config(command=lambda: self.edit_product(prod_id))
+            elif window_type == "add_prod":
+                self.popup_window = AddProductWindow(self.master, self.shared_view)
+                self.popup_window.btn_add_img.config(command=self.change_product_image)
+                self.popup_window.btn_add_prod.config(command=self.add_product)
+
+            if self.popup_window is not None:
+                self.popup_window.protocol('WM_DELETE_WINDOW', self.close_popup_window)
+                self.popup_window.btn_back.config(command=self.close_popup_window)
+
+                self.popup_window.focus_force()
+        else:
+            self.close_popup_window()
+
+    def delete_product(self, prod_id):
+        self.database_model.delete_consumed_products_by_product_id(prod_id)
+        self.database_model.delete_dishes_products_by_product_id(prod_id)
+        self.database_model.delete_product_by_id(self.user_model.user['id_user'], prod_id)
+
+        self.update_products()
+        self.meal_plan_view.update_consumed_products()
+        self.meal_plan_view.update_consumed_dishes()
+        self.close_popup_window()
+
+    def search_product(self):
+        str_to_look_for = self.user_products_view.entry_search.get()
+
+        self.user_model.update_selected_products_ids(str_to_look_for)
+        self.user_products_view.update_products()
+
+    def edit_product(self, product_id):
+        new_prod_name = self.popup_window.entry_name.get()
+        new_prod_calories = self.popup_window.entry_calories.get()
+        new_prod_img = self.popup_window.default_image
+
+        if not self.correct_name(new_prod_name):
+            return
+
+        if not self.correct_calories_value(new_prod_calories):
+            return
+
+        if self.popup_window.new_image:
+            self.database_model.update_product(product_id, new_prod_name, new_prod_calories, new_prod_img)
+        else:
+            self.database_model.update_product_without_img(product_id, new_prod_name, new_prod_calories)
+
+        self.update_products()
+
+        self.close_popup_window()
+
+    def add_product(self):
+        prod_new_name = self.popup_window.entry_name.get()
+        prod_new_calories = self.popup_window.entry_calories.get()
+        prod_new_img = self.popup_window.default_image
+
+        if not self.correct_name(prod_new_name):
+            return
+
+        if not self.correct_calories_value(prod_new_calories):
+            return
+
+        self.database_model.insert_product(self.user_model.user['id_user'], prod_new_name,
+                                           prod_new_calories, prod_new_img)
+
+        self.update_products()
+
+        self.close_popup_window()
+
+    def change_product_image(self):
+        new_image_filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Wybierz obrazek",
+                                                        filetypes=(("Pliki jpg", "*.jpg"), ("Pliki png", "*.png")))
+        if new_image_filename:
+            new_image = convert_to_binary_data(new_image_filename)
+            self.popup_window.set_product_image(new_image)
+
+    def update_products(self):
+        self.user_model.set_current_date(self.user_model.user['current_date'])
+        str_to_find = self.user_products_view.entry_search.get()
+        self.user_model.update_selected_products_ids(str_to_find)
+        self.user_products_view.update_products()
+        self.logged_user_view.update_user_status_view()

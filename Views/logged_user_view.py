@@ -1,12 +1,13 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import *
+from tkinter import ttk
 
 from PIL import ImageTk
 
 from Views.meal_plan_view import MealPlanView
 from Views.profile_view import ProfileView
 from Views.shared_view import center_window
+from Views.user_products import UserProductsView
 
 
 class LoggedUserView(tk.Toplevel):
@@ -21,7 +22,7 @@ class LoggedUserView(tk.Toplevel):
         self.resizable(False, False)
 
         self._create_user_view_frames()
-        self.avatar_render = ""
+
         self._create_user_view_widgets()
 
         self._create_tabs()
@@ -154,3 +155,6 @@ class LoggedUserView(tk.Toplevel):
 
         self.meal_plan_view = MealPlanView(self.tab_meal_plan, self.shared_view, self.user)
         self.meal_plan_view.pack()
+
+        self.user_products_view = UserProductsView(self.tab_products, self.shared_view, self.user)
+        self.user_products_view.pack()

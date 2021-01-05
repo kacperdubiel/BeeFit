@@ -12,6 +12,7 @@ class SharedView:
 
         self.ICON_SIZE = 16
         self.LIST_IMG_SIZE = 48
+        self.ADD_ITEM_IMG_SIZE = 200
 
         self.font_style_10 = tk_font.Font(size=10)
         self.font_style_10_bold = tk_font.Font(size=10, weight='bold')

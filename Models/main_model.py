@@ -1,4 +1,7 @@
+import io
 from datetime import datetime
+
+from PIL import Image
 
 from Misc.config import DATE_FORMAT, GENDER_MALE, GENDER_FEMALE
 
@@ -49,3 +52,7 @@ def convert_to_binary_data(filename):
     with open(filename, 'rb') as file:
         blobData = file.read()
     return blobData
+
+
+def get_image_from_bytes(bytes_img):
+    return Image.open(io.BytesIO(bytes_img))

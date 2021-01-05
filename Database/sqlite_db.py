@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import OperationalError, ProgrammingError
+
 import Database.tables_schema as tables_schema
 from Misc.config import DB_NAME, DB_DIR
 
@@ -117,12 +118,34 @@ def insert_gda(conn, user_id, gda_value, gda_date):
 
 
 @connect
+def insert_product(conn, id_user, new_prod_name, new_prod_calories, new_prod_img):
+    sql = """
+          INSERT INTO Products (IdUser,ProductName,Calories,Image)
+          VALUES (?,?,?,?) 
+          """
+    data_tuple = (id_user, new_prod_name, new_prod_calories, new_prod_img)
+
+    query(conn, sql, data_tuple)
+
+
+@connect
 def insert_consumed_product(conn, product_id, user_id, date, grammage):
     sql = """
           INSERT INTO ConsumedProducts (IdProduct,IdUser,ConsumptionDate,ProductGrammage)
           VALUES (?,?,?,?) 
           """
     data_tuple = (product_id, user_id, date, grammage)
+
+    query(conn, sql, data_tuple)
+
+
+@connect
+def insert_consumed_dish(conn, dish_id, user_id, date, grammage):
+    sql = """
+          INSERT INTO ConsumedDishes (IdDish,IdUser,ConsumptionDate,DishGrammage)
+          VALUES (?,?,?,?) 
+          """
+    data_tuple = (dish_id, user_id, date, grammage)
 
     query(conn, sql, data_tuple)
 
@@ -417,6 +440,26 @@ def update_user_gda_on_date(conn, user_id, date, new_gda):
 
 
 @connect
+def update_product(conn, id_product, new_prod_name, new_prod_calories, new_prod_img):
+    sql = """
+          UPDATE Products SET ProductName=?,Calories=?,Image=? WHERE IdProduct=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_prod_name, new_prod_calories, new_prod_img, id_product))
+    conn.commit()
+
+
+@connect
+def update_product_without_img(conn, id_product, new_prod_name, new_prod_calories):
+    sql = """
+          UPDATE Products SET ProductName=?,Calories=? WHERE IdProduct=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_prod_name, new_prod_calories, id_product))
+    conn.commit()
+
+
+@connect
 def update_consumed_product(conn, id_consumed_product, new_product_id, new_grammage):
     sql = """
           UPDATE ConsumedProducts SET IdProduct=?,ProductGrammage=? WHERE IdConsumedProduct=?;
@@ -426,12 +469,67 @@ def update_consumed_product(conn, id_consumed_product, new_product_id, new_gramm
     conn.commit()
 
 
+@connect
+def update_consumed_dish(conn, id_consumed_dish, new_dish_id, new_grammage):
+    sql = """
+          UPDATE ConsumedDishes SET IdDish=?,DishGrammage=? WHERE IdConsumedDish=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_dish_id, new_grammage, id_consumed_dish))
+    conn.commit()
+
+
 # --- DELETE ---
+
+def delete_product_by_id(conn, id_user, id_product):
+    sql = """
+          DELETE FROM Products WHERE IdProduct=? AND IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_product, id_user))
+    conn.commit()
+
+
+def delete_dish_by_id(conn, id_user, id_dish):
+    sql = """
+          DELETE FROM Dishes WHERE IdDish=? AND IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_dish, id_user))
+    conn.commit()
+
 
 def delete_consumed_product_by_id(conn, id_user, id_consumed_product):
     sql = """
-              DELETE FROM ConsumedProducts WHERE IdConsumedProduct=? AND IdUser=?;
-              """
+          DELETE FROM ConsumedProducts WHERE IdConsumedProduct=? AND IdUser=?;
+          """
     cursor = conn.cursor()
     cursor.execute(sql, (id_consumed_product, id_user))
+    conn.commit()
+
+
+def delete_consumed_products_by_product_id(conn, id_product):
+    sql = """
+          DELETE FROM ConsumedProducts WHERE IdProduct=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_product,))
+    conn.commit()
+
+
+def delete_consumed_dish_by_id(conn, id_user, id_consumed_dish):
+    sql = """
+          DELETE FROM ConsumedDishes WHERE IdConsumedDish=? AND IdUser=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_consumed_dish, id_user))
+    conn.commit()
+
+
+def delete_dishes_products_by_product_id(conn, id_product):
+    sql = """
+          DELETE FROM DishesProducts WHERE IdProduct=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_product,))
     conn.commit()

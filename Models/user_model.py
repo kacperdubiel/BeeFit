@@ -1,6 +1,8 @@
 import io
-from Models.main_model import get_current_date, evaluate_gda
+
 from PIL import Image
+
+from Models.main_model import get_current_date, evaluate_gda
 
 
 class UserModel:
@@ -25,6 +27,7 @@ class UserModel:
 
         self.user['dishes_ids'] = []
         self.user['dishes'] = self.get_user_dishes()
+        self.user['selected_dishes_ids'] = self.get_user_selected_dishes_ids()
 
         self.user['consumed_products'] = self.get_user_consumed_products()
         self.user['consumed_dishes'] = self.get_user_consumed_dishes()
@@ -91,6 +94,16 @@ class UserModel:
 
         return dishes
 
+    def get_user_selected_dishes_ids(self, str_to_look_for=""):
+        found_ids = list()
+        for dish_id in self.user['dishes_ids']:
+            dish_name = self.user['dishes'][f'{dish_id}']['dish_name']
+            str_to_look_for = str_to_look_for.lower()
+            dish_name = dish_name.lower()
+            if str_to_look_for in dish_name:
+                found_ids.append(dish_id)
+        return found_ids
+
     def get_user_consumed_products(self):
         return self.database_model.select_user_consumed_products_at_date(self.user['id_user'],
                                                                          self.user['current_date'])
@@ -101,7 +114,7 @@ class UserModel:
         for c_dish in consumed_dishes:
             id_dish = c_dish['id_dish']
             dish_calories_per_100g = self.user['dishes'][f'{id_dish}']['calories']
-            c_dish['calories'] = int(c_dish['dish_grammage'] * float(dish_calories_per_100g) / 100)
+            c_dish['calories'] = int(c_dish['dish_grammage'] * (float(dish_calories_per_100g) / 100))
 
         return consumed_dishes
 
@@ -131,7 +144,7 @@ class UserModel:
 
         # Dishes calories
         for c_dish in self.user['consumed_dishes']:
-            calories_consumed += self.user['dishes'][f'{c_dish["id_dish"]}']['calories']
+            calories_consumed += c_dish['calories']
 
         return calories_consumed
 
@@ -149,6 +162,9 @@ class UserModel:
 
     def set_current_date(self, new_date):
         self.user['current_date'] = new_date
+
+        self.user['products'] = self.get_user_products()
+        self.user['dishes'] = self.get_user_dishes()
 
         self.user['current_date_weight'] = self.get_user_current_date_weight()
         self.user['current_date_gda'] = self.get_user_current_date_gda()
@@ -184,6 +200,9 @@ class UserModel:
 
     def update_selected_products_ids(self, str_to_look_for):
         self.user['selected_products_ids'] = self.get_user_selected_products_ids(str_to_look_for)
+
+    def update_selected_dishes_ids(self, str_to_look_for):
+        self.user['selected_dishes_ids'] = self.get_user_selected_dishes_ids(str_to_look_for)
 
 
 # --- STATIC METHODS ---
