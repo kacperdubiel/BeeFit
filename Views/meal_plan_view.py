@@ -4,6 +4,7 @@ from tkinter import ttk
 
 from PIL import ImageTk
 
+from Misc.config import GI_RATING_OPTIONS
 from Models.user_model import scale_image
 from Views.shared_view import center_window
 
@@ -106,9 +107,18 @@ class MealPlanView(ttk.Frame):
             label_name = Label(frame_name, text=f"{c_prod['product_name']}", font=self.shared_view.font_style_10_bold)
             label_name.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
+            # GI rating
+            frame_gi_rating = Frame(frame_product, relief="ridge", bd=1)
+            frame_gi_rating.grid(row=0, column=3, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+
+            gi_rating_index = c_prod['glycemic_index_rating']
+            label_gi_rating = Label(frame_gi_rating, text=f"{GI_RATING_OPTIONS[gi_rating_index]}",
+                                    font=self.shared_view.font_style_10)
+            label_gi_rating.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
+
             # Grammage
             frame_grammage = Frame(frame_product, relief="ridge", bd=1)
-            frame_grammage.grid(row=0, column=3, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+            frame_grammage.grid(row=0, column=4, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
 
             label_grammage = Label(frame_grammage, text=f"{c_prod['product_grammage']} g",
                                    font=self.shared_view.font_style_10)
@@ -116,7 +126,7 @@ class MealPlanView(ttk.Frame):
 
             # Calories
             frame_calories = Frame(frame_product, relief="ridge", bd=1)
-            frame_calories.grid(row=0, column=4, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+            frame_calories.grid(row=0, column=5, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
 
             frame_center = Frame(frame_calories)
             frame_center.pack()
@@ -217,9 +227,18 @@ class MealPlanView(ttk.Frame):
             label_name = Label(frame_name, text=f"{c_dish['dish_name']}", font=self.shared_view.font_style_10_bold)
             label_name.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
+            # GI rating
+            frame_gi_rating = Frame(frame_dish, relief="ridge", bd=1)
+            frame_gi_rating.grid(row=0, column=3, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+
+            gi_rating_index = c_dish['glycemic_index_rating']
+            label_gi_rating = Label(frame_gi_rating, text=f"{GI_RATING_OPTIONS[gi_rating_index]}",
+                                    font=self.shared_view.font_style_10)
+            label_gi_rating.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
+
             # Grammage
             frame_grammage = Frame(frame_dish, relief="ridge", bd=1)
-            frame_grammage.grid(row=0, column=3, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+            frame_grammage.grid(row=0, column=4, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
 
             label_grammage = Label(frame_grammage, text=f"{c_dish['dish_grammage']} g",
                                    font=self.shared_view.font_style_10)
@@ -227,7 +246,7 @@ class MealPlanView(ttk.Frame):
 
             # Calories
             frame_calories = Frame(frame_dish, relief="ridge", bd=1)
-            frame_calories.grid(row=0, column=4, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+            frame_calories.grid(row=0, column=5, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
 
             frame_center = Frame(frame_calories)
             frame_center.pack()
@@ -412,6 +431,15 @@ class AddConsumedProductWindow(tk.Toplevel):
             label_name = Label(frame_name, text=f"{self.user_prods[f'{product_id}']['product_name']}",
                                font=self.shared_view.font_style_10_bold)
             label_name.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
+
+            # GI rating
+            frame_gi_rating = Frame(frame_product, relief="ridge", bd=1)
+            frame_gi_rating.grid(row=0, column=3, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+
+            gi_rating_index = self.user_prods[f'{product_id}']['glycemic_index_rating']
+            label_gi_rating = Label(frame_gi_rating, text=f"{GI_RATING_OPTIONS[gi_rating_index]}",
+                                    font=self.shared_view.font_style_10)
+            label_gi_rating.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
             # Calories
             frame_calories = Frame(frame_product, relief="ridge", bd=1)
@@ -605,6 +633,15 @@ class AddConsumedDishWindow(tk.Toplevel):
             label_name = Label(frame_name, text=f"{self.user_dishes[f'{dish_id}']['dish_name']}",
                                font=self.shared_view.font_style_10_bold)
             label_name.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
+
+            # GI rating
+            frame_gi_rating = Frame(frame_dish, relief="ridge", bd=1)
+            frame_gi_rating.grid(row=0, column=3, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+
+            gi_rating_index = self.user_dishes[f'{dish_id}']['glycemic_index_rating']
+            label_gi_rating = Label(frame_gi_rating, text=f"{GI_RATING_OPTIONS[gi_rating_index]}",
+                                    font=self.shared_view.font_style_10)
+            label_gi_rating.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
             # Calories
             frame_calories = Frame(frame_dish, relief="ridge", bd=1)

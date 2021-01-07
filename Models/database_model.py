@@ -45,8 +45,8 @@ class DatabaseModel:
     def insert_gda(self, user_id, gda_value, gda_date):
         sqlite_db.insert_gda(self.conn, user_id, gda_value, gda_date)
 
-    def insert_product(self, id_user, new_prod_name, new_prod_calories, new_prod_img):
-        sqlite_db.insert_product(self.conn, id_user, new_prod_name, new_prod_calories, new_prod_img)
+    def insert_product(self, id_user, product_name, calories, image, glycemic_index_rating):
+        sqlite_db.insert_product(self.conn, id_user, product_name, calories, image, glycemic_index_rating)
 
     def insert_consumed_product(self, product_id, user_id, date, grammage):
         sqlite_db.insert_consumed_product(self.conn, product_id, user_id, date, grammage)
@@ -59,13 +59,15 @@ class DatabaseModel:
     def select_user_by_login(self, login):
         row = sqlite_db.select_user_by_login(self.conn, login)
         user = self.user_row_to_user_dict(row)
-        user['avatar'] = get_image_from_bytes(user['avatar'])
+        if user is not None:
+            user['avatar'] = get_image_from_bytes(user['avatar'])
         return user
 
     def select_user_by_login_and_password(self, login, password):
         row = sqlite_db.select_user_by_login_and_password(self.conn, login, password)
         user = self.user_row_to_user_dict(row)
-        user['avatar'] = get_image_from_bytes(user['avatar'])
+        if user is not None:
+            user['avatar'] = get_image_from_bytes(user['avatar'])
         return user
 
     def select_user_by_email(self, email):
@@ -186,11 +188,11 @@ class DatabaseModel:
     def update_user_gda_on_date(self, id_user, date, new_gda):
         sqlite_db.update_user_gda_on_date(self.conn, id_user, date, new_gda)
 
-    def update_product(self, id_product, new_prod_name, new_prod_calories, new_prod_img):
-        sqlite_db.update_product(self.conn, id_product, new_prod_name, new_prod_calories, new_prod_img)
+    def update_product(self, id_product, product_name, calories, image, glycemic_index_rating):
+        sqlite_db.update_product(self.conn, id_product, product_name, calories, image, glycemic_index_rating)
 
-    def update_product_without_img(self, id_product, new_prod_name, new_prod_calories):
-        sqlite_db.update_product_without_img(self.conn, id_product, new_prod_name, new_prod_calories)
+    def update_product_without_img(self, id_product, product_name, calories, glycemic_index_rating):
+        sqlite_db.update_product_without_img(self.conn, id_product, product_name, calories, glycemic_index_rating)
 
     def update_consumed_product(self, id_consumed_product, new_product_id, new_grammage):
         sqlite_db.update_consumed_product(self.conn, id_consumed_product, new_product_id, new_grammage)
@@ -260,7 +262,8 @@ class DatabaseModel:
                 'id_user': row[1],
                 'product_name': row[2],
                 'calories': row[3],
-                'image': row[4]
+                'image': row[4],
+                'glycemic_index_rating': row[5]
             }
             return product
         else:
@@ -273,7 +276,8 @@ class DatabaseModel:
                 'id_dish': row[0],
                 'id_user': row[1],
                 'dish_name': row[2],
-                'image': row[3]
+                'image': row[3],
+                'glycemic_index_rating': row[4]
             }
             return dish
         else:
@@ -289,7 +293,8 @@ class DatabaseModel:
                 'product_grammage': row[3],
                 'product_name': row[4],
                 'calories': row[5],
-                'image': row[6]
+                'image': row[6],
+                'glycemic_index_rating': row[7]
             }
             return dish_product
         else:
@@ -306,7 +311,8 @@ class DatabaseModel:
                 'product_grammage': row[4],
                 'product_name': row[5],
                 'calories': row[6],
-                'image': row[7]
+                'image': row[7],
+                'glycemic_index_rating': row[8]
             }
             return consumed_product
         else:
@@ -322,7 +328,8 @@ class DatabaseModel:
                 'consumption_date': row[3],
                 'dish_grammage': row[4],
                 'dish_name': row[5],
-                'image': row[6]
+                'image': row[6],
+                'glycemic_index_rating': row[7]
             }
             return consumed_dish
         else:

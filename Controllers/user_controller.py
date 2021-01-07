@@ -5,7 +5,7 @@ from tkinter import filedialog
 import Controllers.main_controller as main_controller
 from Misc.config import DATE_FORMAT, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_MAX, \
     AGE_MIN, AGE_MAX, ACTIVITY_VALUE_MIN, ACTIVITY_VALUE_MAX, GOAL_VALUE_MIN, GOAL_VALUE_MAX, GRAMMAGE_MIN, \
-    GRAMMAGE_MAX, FOOD_NAME_LENGTH_MIN, FOOD_NAME_LENGTH_MAX, CALORIES_MIN, CALORIES_MAX
+    GRAMMAGE_MAX, FOOD_NAME_LENGTH_MIN, FOOD_NAME_LENGTH_MAX, CALORIES_MIN, CALORIES_MAX, GI_RATING_OPTIONS_LIST
 from Models.main_model import get_current_date, format_date, convert_to_binary_data
 from Models.user_model import UserModel
 from Views.logged_user_view import LoggedUserView
@@ -111,6 +111,17 @@ class UserController:
             return False
 
         return True
+
+    @staticmethod
+    def convert_ig_rating_name_to_number(value):
+        if value == GI_RATING_OPTIONS_LIST[1]:
+            return 1
+        elif value == GI_RATING_OPTIONS_LIST[2]:
+            return 2
+        elif value == GI_RATING_OPTIONS_LIST[3]:
+            return 3
+        else:
+            return 0
 
     # --- PROFILE VIEW ---
 
@@ -495,9 +506,10 @@ class UserController:
                     product_name = product_to_edit['product_name']
                     product_calories = product_to_edit['calories']
                     product_image = product_to_edit['image']
+                    product_gi_rating = product_to_edit['glycemic_index_rating']
 
                     self.popup_window = AddProductWindow(self.master, self.shared_view, product_name, product_calories,
-                                                         product_image)
+                                                         product_image, product_gi_rating)
                     self.popup_window.btn_add_img.config(command=self.change_product_image)
                     self.popup_window.btn_add_prod.config(command=lambda: self.edit_product(prod_id))
             elif window_type == "add_prod":
@@ -530,38 +542,42 @@ class UserController:
         self.user_products_view.update_products()
 
     def edit_product(self, product_id):
-        new_prod_name = self.popup_window.entry_name.get()
-        new_prod_calories = self.popup_window.entry_calories.get()
-        new_prod_img = self.popup_window.default_image
+        new_name = self.popup_window.entry_name.get()
+        new_calories = self.popup_window.entry_calories.get()
+        new_image = self.popup_window.default_image
+        new_gi_rating = self.popup_window.gi_rating_value.get()
+        new_gi_rating = self.convert_ig_rating_name_to_number(new_gi_rating)
 
-        if not self.correct_name(new_prod_name):
+        if not self.correct_name(new_name):
             return
 
-        if not self.correct_calories_value(new_prod_calories):
+        if not self.correct_calories_value(new_calories):
             return
 
         if self.popup_window.new_image:
-            self.database_model.update_product(product_id, new_prod_name, new_prod_calories, new_prod_img)
+            self.database_model.update_product(product_id, new_name, new_calories, new_image, new_gi_rating)
         else:
-            self.database_model.update_product_without_img(product_id, new_prod_name, new_prod_calories)
+            self.database_model.update_product_without_img(product_id, new_name, new_calories, new_gi_rating)
 
         self.update_products()
 
         self.close_popup_window()
 
     def add_product(self):
-        prod_new_name = self.popup_window.entry_name.get()
-        prod_new_calories = self.popup_window.entry_calories.get()
-        prod_new_img = self.popup_window.default_image
+        prod_name = self.popup_window.entry_name.get()
+        prod_calories = self.popup_window.entry_calories.get()
+        prod_image = self.popup_window.default_image
+        prod_gi_rating = self.popup_window.gi_rating_value.get()
+        prod_gi_rating = self.convert_ig_rating_name_to_number(prod_gi_rating)
 
-        if not self.correct_name(prod_new_name):
+        if not self.correct_name(prod_name):
             return
 
-        if not self.correct_calories_value(prod_new_calories):
+        if not self.correct_calories_value(prod_calories):
             return
 
-        self.database_model.insert_product(self.user_model.user['id_user'], prod_new_name,
-                                           prod_new_calories, prod_new_img)
+        self.database_model.insert_product(self.user_model.user['id_user'], prod_name, prod_calories, prod_image,
+                                           prod_gi_rating)
 
         self.update_products()
 

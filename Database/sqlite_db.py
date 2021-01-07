@@ -118,12 +118,12 @@ def insert_gda(conn, user_id, gda_value, gda_date):
 
 
 @connect
-def insert_product(conn, id_user, new_prod_name, new_prod_calories, new_prod_img):
+def insert_product(conn, id_user, product_name, calories, image, glycemic_index_rating):
     sql = """
-          INSERT INTO Products (IdUser,ProductName,Calories,Image)
-          VALUES (?,?,?,?) 
+          INSERT INTO Products (IdUser,ProductName,Calories,Image,GlycemicIndexRating)
+          VALUES (?,?,?,?,?) 
           """
-    data_tuple = (id_user, new_prod_name, new_prod_calories, new_prod_img)
+    data_tuple = (id_user, product_name, calories, image, glycemic_index_rating)
 
     query(conn, sql, data_tuple)
 
@@ -299,7 +299,8 @@ def select_user_dishes(conn, user_id):
 @connect
 def select_dishes_products(conn, dish_id):
     sql = """
-          SELECT dp.IdDishesProducts, dp.IdDish, dp.IdProduct, dp.ProductGrammage, p.ProductName, p.Calories, p.Image
+          SELECT dp.IdDishesProducts, dp.IdDish, dp.IdProduct, dp.ProductGrammage, p.ProductName, p.Calories, p.Image,
+          p.GlycemicIndexRating
           FROM DishesProducts AS dp
           INNER JOIN Products AS p ON dp.IdProduct=p.IdProduct
           WHERE IdDish=?;
@@ -330,7 +331,7 @@ def select_user_trainings_at_date(conn, user_id, current_date):
 def select_user_consumed_products_at_date(conn, user_id, current_date):
     sql = """
           SELECT cp.IdConsumedProduct, cp.IdProduct, cp.IdUser, cp.ConsumptionDate, cp.ProductGrammage, 
-                 p.ProductName, p.Calories, p.Image
+                 p.ProductName, p.Calories, p.Image, p.GlycemicIndexRating
           FROM ConsumedProducts AS cp
           INNER JOIN Products AS p ON cp.IdProduct=p.IdProduct
           WHERE cp.IdUser=? AND cp.ConsumptionDate=?;
@@ -345,7 +346,8 @@ def select_user_consumed_products_at_date(conn, user_id, current_date):
 @connect
 def select_user_consumed_dishes_at_date(conn, user_id, current_date):
     sql = """
-          SELECT cd.IdConsumedDish, cd.IdDish, cd.IdUser, cd.ConsumptionDate, cd.DishGrammage, d.DishName, d.Image
+          SELECT cd.IdConsumedDish, cd.IdDish, cd.IdUser, cd.ConsumptionDate, cd.DishGrammage, d.DishName, d.Image, 
+          d.GlycemicIndexRating
           FROM ConsumedDishes AS cd
           INNER JOIN Dishes AS d ON cd.IdDish=d.IdDish
           WHERE cd.IdUser=? AND cd.ConsumptionDate=?;
@@ -440,22 +442,22 @@ def update_user_gda_on_date(conn, user_id, date, new_gda):
 
 
 @connect
-def update_product(conn, id_product, new_prod_name, new_prod_calories, new_prod_img):
+def update_product(conn, id_product, new_prod_name, new_prod_calories, new_prod_img, glycemic_index_rating):
     sql = """
-          UPDATE Products SET ProductName=?,Calories=?,Image=? WHERE IdProduct=?;
+          UPDATE Products SET ProductName=?,Calories=?,Image=?,GlycemicIndexRating=? WHERE IdProduct=?;
           """
     cursor = conn.cursor()
-    cursor.execute(sql, (new_prod_name, new_prod_calories, new_prod_img, id_product))
+    cursor.execute(sql, (new_prod_name, new_prod_calories, new_prod_img, glycemic_index_rating, id_product))
     conn.commit()
 
 
 @connect
-def update_product_without_img(conn, id_product, new_prod_name, new_prod_calories):
+def update_product_without_img(conn, id_product, new_prod_name, new_prod_calories, glycemic_index_rating):
     sql = """
-          UPDATE Products SET ProductName=?,Calories=? WHERE IdProduct=?;
+          UPDATE Products SET ProductName=?,Calories=?,GlycemicIndexRating=? WHERE IdProduct=?;
           """
     cursor = conn.cursor()
-    cursor.execute(sql, (new_prod_name, new_prod_calories, id_product))
+    cursor.execute(sql, (new_prod_name, new_prod_calories, glycemic_index_rating, id_product))
     conn.commit()
 
 

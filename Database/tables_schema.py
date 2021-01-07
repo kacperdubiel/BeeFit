@@ -62,6 +62,7 @@ SQL_PRODUCTS_TABLE = """
                             ProductName TEXT NOT NULL,
                             Calories INTEGER NOT NULL,
                             Image BLOB NOT NULL,
+                            GlycemicIndexRating INTEGER NOT NULL,
                             FOREIGN KEY (IdUser) REFERENCES Users (IdUser)
                         );
                      """
@@ -72,6 +73,7 @@ SQL_DISHES_TABLE = """
                         IdUser INTEGER NOT NULL,
                         DishName TEXT NOT NULL,
                         Image BLOB NOT NULL,
+                        GlycemicIndexRating INTEGER NOT NULL,
                         FOREIGN KEY (IdUser) REFERENCES Users (IdUser)
                     );
                    """

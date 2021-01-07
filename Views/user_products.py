@@ -4,7 +4,7 @@ from tkinter import ttk
 
 from PIL import ImageTk
 
-from Misc.config import IMG_PATH_NO_IMAGE
+from Misc.config import IMG_PATH_NO_IMAGE, GI_RATING_OPTIONS, GI_RATING_OPTIONS_LIST
 from Models.main_model import convert_to_binary_data, get_image_from_bytes
 from Models.user_model import scale_image
 from Views.shared_view import center_window
@@ -110,6 +110,15 @@ class UserProductsView(ttk.Frame):
             label_name = Label(frame_name, text=f"{product['product_name']}", font=self.shared_view.font_style_10_bold)
             label_name.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
+            # GI rating
+            frame_gi_rating = Frame(frame_product, relief="ridge", bd=1)
+            frame_gi_rating.grid(row=0, column=3, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+
+            gi_rating_index = product['glycemic_index_rating']
+            label_gi_rating = Label(frame_gi_rating, text=f"{GI_RATING_OPTIONS[gi_rating_index]}",
+                                    font=self.shared_view.font_style_10)
+            label_gi_rating.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
+
             # Calories
             frame_calories = Frame(frame_product, relief="ridge", bd=1)
             frame_calories.grid(row=0, column=4, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
@@ -189,12 +198,14 @@ class DeleteProductWindow(tk.Toplevel):
 
 
 class AddProductWindow(tk.Toplevel):
-    def __init__(self, master, shared_view, default_name="Nazwa produktu", default_calories=100, default_image=None):
+    def __init__(self, master, shared_view, default_name="Nazwa produktu", default_calories=100, default_image=None,
+                 default_ig_rating=0):
         tk.Toplevel.__init__(self, master)
         self.shared_view = shared_view
         self.default_name = default_name
         self.default_calories = default_calories
         self.default_image = default_image
+        self.default_ig_rating = default_ig_rating
         self.new_image = False
         self.withdraw()
 
@@ -220,6 +231,19 @@ class AddProductWindow(tk.Toplevel):
         self.entry_name = tk.Entry(frame_name, font=self.shared_view.font_style_12)
         self.entry_name.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.SMALL_PAD)
         self.entry_name.insert(0, f'{self.default_name}')
+
+        label_frame = ttk.LabelFrame(self.frame_main, text="Stopień indeksu glikemicznego:")
+        label_frame.pack(fill=tk.BOTH, expand=1, pady=(self.shared_view.NORMAL_PAD, 0))
+
+        frame_gi_rating = ttk.Frame(label_frame)
+        frame_gi_rating.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
+
+        gi_rating_options_list = GI_RATING_OPTIONS_LIST
+        self.gi_rating_value = tk.StringVar(value=gi_rating_options_list[0])
+        goal_option_menu = tk.OptionMenu(frame_gi_rating, self.gi_rating_value, *gi_rating_options_list)
+        goal_option_menu.config(font=self.shared_view.font_style_12)
+        goal_option_menu.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD,
+                              pady=(self.shared_view.SMALL_PAD, self.shared_view.NORMAL_PAD))
 
         label_frame = ttk.LabelFrame(self.frame_main, text="Liczba kalorii na 100 gram:")
         label_frame.pack(fill=tk.BOTH, expand=1, pady=(self.shared_view.NORMAL_PAD, 0))
