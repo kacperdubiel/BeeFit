@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import *
+from tkinter import ttk
+
 from PIL import ImageTk, Image
 
 from Misc.config import IMG_PATH_PENCIL_ICON, IMG_PATH_PLUS_ICON, IMG_PATH_COG_ICON, ACTIVITY_OPTIONS, GOAL_OPTIONS
@@ -66,7 +67,7 @@ class ProfileView(ttk.Frame):
         # --- LEFT BLOCK ---
         # Gender
         self.frame_gender = ttk.Frame(self.frame_left_block)
-        self.frame_gender.pack(fill='both', pady=(0, self.shared_view.VERY_SMALL_PAD))
+        self.frame_gender.pack(fill='both', pady=(0, self.shared_view.SMALL_PAD))
 
         self.label_gender = Label(self.frame_gender, text=f"Płeć: ", font=self.shared_view.font_style_12_bold)
         self.label_gender.pack(side="left")
@@ -80,7 +81,7 @@ class ProfileView(ttk.Frame):
 
         # Weight
         self.frame_weight = ttk.Frame(self.frame_left_block)
-        self.frame_weight.pack(fill='both', pady=(0, self.shared_view.VERY_SMALL_PAD))
+        self.frame_weight.pack(fill='both', pady=(0, self.shared_view.SMALL_PAD))
 
         self.label_weight = Label(self.frame_weight, text=f"Waga [kg]: ", font=self.shared_view.font_style_12_bold)
         self.label_weight.pack(side="left")
@@ -94,7 +95,7 @@ class ProfileView(ttk.Frame):
 
         # Height
         self.frame_height = ttk.Frame(self.frame_left_block)
-        self.frame_height.pack(fill='both', pady=(0, self.shared_view.VERY_SMALL_PAD))
+        self.frame_height.pack(fill='both', pady=(0, self.shared_view.SMALL_PAD))
 
         self.label_height = Label(self.frame_height, text=f"Wzrost [cm]: ", font=self.shared_view.font_style_12_bold)
         self.label_height.pack(side="left")
@@ -123,7 +124,7 @@ class ProfileView(ttk.Frame):
         # --- RIGHT BLOCK ---
         # Physical activity
         self.frame_activity = ttk.Frame(self.frame_right_block)
-        self.frame_activity.pack(fill='both', pady=(0, self.shared_view.VERY_SMALL_PAD))
+        self.frame_activity.pack(fill='both', pady=(0, self.shared_view.SMALL_PAD))
 
         self.label_activity = Label(self.frame_activity, text=f"Aktywność fizyczna: ",
                                     font=self.shared_view.font_style_12_bold)
@@ -139,7 +140,7 @@ class ProfileView(ttk.Frame):
 
         # Goal
         self.frame_goal = ttk.Frame(self.frame_right_block)
-        self.frame_goal.pack(fill='both', pady=(0, self.shared_view.VERY_SMALL_PAD))
+        self.frame_goal.pack(fill='both', pady=(0, self.shared_view.SMALL_PAD))
 
         self.label_goal = Label(self.frame_goal, text=f"Cel: ", font=self.shared_view.font_style_12_bold)
         self.label_goal.pack(side="left")
@@ -151,9 +152,10 @@ class ProfileView(ttk.Frame):
 
         self.btn_set_goal = tk.Button(self.frame_goal, image=self.icon_pencil)
         self.btn_set_goal.pack(side="left")
+
         # GDA
         self.frame_gda = ttk.Frame(self.frame_right_block)
-        self.frame_gda.pack(fill='both', pady=(0, self.shared_view.VERY_SMALL_PAD))
+        self.frame_gda.pack(fill='both', pady=(0, self.shared_view.SMALL_PAD))
 
         self.label_gda = Label(self.frame_gda, text=f"Dzienne zapotrzebowanie: ",
                                font=self.shared_view.font_style_12_bold)

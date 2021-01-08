@@ -129,6 +129,29 @@ def insert_product(conn, id_user, product_name, calories, image, glycemic_index_
 
 
 @connect
+def insert_dish(conn, id_user, dish_name, dish_image, dish_gi_rating):
+    sql = """
+          INSERT INTO Dishes (IdUser,DishName,Image,GlycemicIndexRating)
+          VALUES (?,?,?,?) 
+          """
+    data_tuple = (id_user, dish_name, dish_image, dish_gi_rating)
+
+    query(conn, sql, data_tuple)
+
+
+@connect
+def insert_many_dishes_products(conn, values):
+    sql = """
+          INSERT INTO DishesProducts (IdDish,IdProduct,ProductGrammage)
+          VALUES (?,?,?) 
+          """
+    cursor = conn.cursor()
+    cursor.executemany(sql, values)
+    conn.commit()
+    cursor.close()
+
+
+@connect
 def insert_consumed_product(conn, product_id, user_id, date, grammage):
     sql = """
           INSERT INTO ConsumedProducts (IdProduct,IdUser,ConsumptionDate,ProductGrammage)
@@ -313,6 +336,18 @@ def select_dishes_products(conn, dish_id):
 
 
 @connect
+def select_user_last_dish_id(conn, id_user):
+    sql = """
+          SELECT IdDish FROM Dishes WHERE IdUser=? ORDER BY IdDish DESC LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_user,))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
 def select_user_trainings_at_date(conn, user_id, current_date):
     sql = """
           SELECT t.*, tt.*
@@ -462,6 +497,26 @@ def update_product_without_img(conn, id_product, new_prod_name, new_prod_calorie
 
 
 @connect
+def update_dish(conn, dish_id, new_name, new_image, new_gi_rating):
+    sql = """
+          UPDATE Dishes SET DishName=?,Image=?,GlycemicIndexRating=? WHERE IdDish=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_name, new_image, new_gi_rating, dish_id))
+    conn.commit()
+
+
+@connect
+def update_dish_without_img(conn, dish_id, new_name, new_gi_rating):
+    sql = """
+          UPDATE Dishes SET DishName=?,GlycemicIndexRating=? WHERE IdDish=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_name, new_gi_rating, dish_id))
+    conn.commit()
+
+
+@connect
 def update_consumed_product(conn, id_consumed_product, new_product_id, new_grammage):
     sql = """
           UPDATE ConsumedProducts SET IdProduct=?,ProductGrammage=? WHERE IdConsumedProduct=?;
@@ -528,10 +583,28 @@ def delete_consumed_dish_by_id(conn, id_user, id_consumed_dish):
     conn.commit()
 
 
+def delete_consumed_dishes_by_dish_id(conn, id_dish):
+    sql = """
+          DELETE FROM ConsumedDishes WHERE IdDish=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_dish,))
+    conn.commit()
+
+
 def delete_dishes_products_by_product_id(conn, id_product):
     sql = """
           DELETE FROM DishesProducts WHERE IdProduct=?;
           """
     cursor = conn.cursor()
     cursor.execute(sql, (id_product,))
+    conn.commit()
+
+
+def delete_dishes_products_by_dish_id(conn, id_dish):
+    sql = """
+          DELETE FROM DishesProducts WHERE IdDish=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_dish,))
     conn.commit()

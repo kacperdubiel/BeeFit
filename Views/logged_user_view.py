@@ -7,7 +7,8 @@ from PIL import ImageTk
 from Views.meal_plan_view import MealPlanView
 from Views.profile_view import ProfileView
 from Views.shared_view import center_window
-from Views.user_products import UserProductsView
+from Views.user_dishes_view import UserDishesView
+from Views.user_products_view import UserProductsView
 
 
 class LoggedUserView(tk.Toplevel):
@@ -62,7 +63,7 @@ class LoggedUserView(tk.Toplevel):
 
         # BOTTOM BLOCK
         self.frame_bottom_block = ttk.Frame(self.frame_user_view)
-        self.frame_bottom_block.pack(fill=tk.BOTH, pady=(self.shared_view.NORMAL_PAD, 0))
+        self.frame_bottom_block.pack(pady=(self.shared_view.NORMAL_PAD, 0))
 
     def _create_user_view_widgets(self):
         # Avatar
@@ -134,6 +135,7 @@ class LoggedUserView(tk.Toplevel):
 
     def _create_tabs(self):
         self.tab_control = ttk.Notebook(self.frame_bottom_block)
+        self.tab_control.bind("<<NotebookTabChanged>>", _on_tab_changed)
 
         self.tab_profile = ttk.Frame(self.tab_control)
         self.tab_meal_plan = ttk.Frame(self.tab_control)
@@ -148,7 +150,8 @@ class LoggedUserView(tk.Toplevel):
         self.tab_control.add(self.tab_dishes, text='Dania')
         self.tab_control.add(self.tab_trainings, text='Treningi')
         self.tab_control.add(self.tab_raports, text='Raporty')
-        self.tab_control.pack(expand=1, fill="both")
+
+        self.tab_control.pack()
 
         self.profile_view = ProfileView(self.tab_profile, self.shared_view, self.user)
         self.profile_view.pack()
@@ -158,3 +161,13 @@ class LoggedUserView(tk.Toplevel):
 
         self.user_products_view = UserProductsView(self.tab_products, self.shared_view, self.user)
         self.user_products_view.pack()
+
+        self.user_dishes_view = UserDishesView(self.tab_dishes, self.shared_view, self.user)
+        self.user_dishes_view.pack()
+
+
+def _on_tab_changed(event):
+    event.widget.update_idletasks()
+
+    tab = event.widget.nametowidget(event.widget.select())
+    event.widget.configure(height=tab.winfo_reqheight())

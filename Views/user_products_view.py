@@ -133,7 +133,6 @@ class UserProductsView(ttk.Frame):
             index += 1
 
     def _create_products_buttons(self):
-        # Consumed products buttons
         self.frame_buttons = ttk.Frame(self.frame_main)
         self.frame_buttons.pack()
 
@@ -222,44 +221,51 @@ class AddProductWindow(tk.Toplevel):
         self.deiconify()
 
     def _create_entries(self):
-        label_frame = ttk.LabelFrame(self.frame_main, text="Nazwa nowego produktu:")
-        label_frame.pack(fill=tk.BOTH, expand=1, pady=(self.shared_view.NORMAL_PAD, 0))
+        # Name
+        label_frame = LabelFrame(self.frame_main, text="Nazwa nowego produktu:",
+                                 font=self.shared_view.font_style_10_bold)
+        label_frame.pack(fill=tk.BOTH, expand=1)
 
         frame_name = ttk.Frame(label_frame)
-        frame_name.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
+        frame_name.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
         self.entry_name = tk.Entry(frame_name, font=self.shared_view.font_style_12)
-        self.entry_name.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.SMALL_PAD)
+        self.entry_name.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
         self.entry_name.insert(0, f'{self.default_name}')
 
-        label_frame = ttk.LabelFrame(self.frame_main, text="Stopień indeksu glikemicznego:")
+        # GI rating
+        label_frame = LabelFrame(self.frame_main, text="Stopień indeksu glikemicznego:",
+                                 font=self.shared_view.font_style_10_bold)
         label_frame.pack(fill=tk.BOTH, expand=1, pady=(self.shared_view.NORMAL_PAD, 0))
 
         frame_gi_rating = ttk.Frame(label_frame)
-        frame_gi_rating.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
+        frame_gi_rating.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
         gi_rating_options_list = GI_RATING_OPTIONS_LIST
-        self.gi_rating_value = tk.StringVar(value=gi_rating_options_list[0])
-        goal_option_menu = tk.OptionMenu(frame_gi_rating, self.gi_rating_value, *gi_rating_options_list)
-        goal_option_menu.config(font=self.shared_view.font_style_12)
-        goal_option_menu.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD,
-                              pady=(self.shared_view.SMALL_PAD, self.shared_view.NORMAL_PAD))
+        self.gi_rating_value = tk.StringVar(value=gi_rating_options_list[self.default_ig_rating])
+        gi_option_menu = tk.OptionMenu(frame_gi_rating, self.gi_rating_value, *gi_rating_options_list)
+        gi_option_menu.config(font=self.shared_view.font_style_12)
+        gi_option_menu.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD,
+                            pady=(self.shared_view.SMALL_PAD, self.shared_view.SMALL_PAD))
 
-        label_frame = ttk.LabelFrame(self.frame_main, text="Liczba kalorii na 100 gram:")
-        label_frame.pack(fill=tk.BOTH, expand=1, pady=(self.shared_view.NORMAL_PAD, 0))
+        # Calories
+        label_frame = LabelFrame(self.frame_main, text="Liczba kalorii na 100 gram:",
+                                 font=self.shared_view.font_style_10_bold)
+        label_frame.pack(fill=tk.BOTH, expand=1, pady=(self.shared_view.SMALL_PAD, 0))
 
         frame_calories = ttk.Frame(label_frame)
-        frame_calories.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
+        frame_calories.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
         self.entry_calories = tk.Entry(frame_calories, font=self.shared_view.font_style_12)
-        self.entry_calories.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.SMALL_PAD)
+        self.entry_calories.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
         self.entry_calories.insert(0, f'{self.default_calories}')
 
-        label_frame = ttk.LabelFrame(self.frame_main, text="Zdjęcie produktu:")
-        label_frame.pack(fill=tk.BOTH, pady=(self.shared_view.NORMAL_PAD, 0))
+        # Image
+        label_frame = LabelFrame(self.frame_main, text="Zdjęcie produktu:", font=self.shared_view.font_style_10_bold)
+        label_frame.pack(fill=tk.BOTH, pady=(self.shared_view.SMALL_PAD, 0))
 
         frame_image = ttk.Frame(label_frame)
-        frame_image.pack(fill=tk.BOTH, padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
+        frame_image.pack(fill=tk.BOTH, padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
         if self.default_image is None:
             self.default_image = convert_to_binary_data(IMG_PATH_NO_IMAGE)
