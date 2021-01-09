@@ -173,6 +173,17 @@ def insert_consumed_dish(conn, dish_id, user_id, date, grammage):
     query(conn, sql, data_tuple)
 
 
+@connect
+def insert_training(conn, training_type_id, id_user, duration, date):
+    sql = """
+          INSERT INTO Trainings (IdTrainingType,IdUser,DurationInMin,TrainingDate)
+          VALUES (?,?,?,?) 
+          """
+    data_tuple = (training_type_id, id_user, duration, date)
+
+    query(conn, sql, data_tuple)
+
+
 # --- SELECT ---
 
 @connect
@@ -350,13 +361,26 @@ def select_user_last_dish_id(conn, id_user):
 @connect
 def select_user_trainings_at_date(conn, user_id, current_date):
     sql = """
-          SELECT t.*, tt.*
+          SELECT t.IdTraining, t.IdTrainingType, t.IdUser, t.DurationInMin, t.TrainingDate, tt.TrainingName, 
+          tt.BurnedCaloriesPerMinPerKg
           FROM Trainings AS t
           INNER JOIN TrainingTypes AS tt ON t.IdTrainingType=tt.IdTrainingType
           WHERE t.IdUser=? AND t.TrainingDate=?;
           """
     cursor = conn.cursor()
     cursor.execute(sql, (user_id, current_date))
+
+    rows = cursor.fetchall()
+    return rows
+
+
+@connect
+def select_training_types(conn):
+    sql = """
+          SELECT * FROM TrainingTypes;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql)
 
     rows = cursor.fetchall()
     return rows
@@ -536,6 +560,16 @@ def update_consumed_dish(conn, id_consumed_dish, new_dish_id, new_grammage):
     conn.commit()
 
 
+@connect
+def update_training(conn, id_training, new_training_type_id, new_duration):
+    sql = """
+          UPDATE Trainings SET IdTrainingType=?,DurationInMin=? WHERE IdTraining=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (new_training_type_id, new_duration, id_training))
+    conn.commit()
+
+
 # --- DELETE ---
 
 def delete_product_by_id(conn, id_user, id_product):
@@ -607,4 +641,13 @@ def delete_dishes_products_by_dish_id(conn, id_dish):
           """
     cursor = conn.cursor()
     cursor.execute(sql, (id_dish,))
+    conn.commit()
+
+
+def delete_training_by_id(conn, id_training):
+    sql = """
+          DELETE FROM Trainings WHERE IdTraining=?;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_training,))
     conn.commit()

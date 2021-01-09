@@ -45,3 +45,5 @@ GI_RATING_VALUE_MAX = 3
 GI_RATING_OPTIONS = ["IG: 0", "IG: I", "IG: II", "IG: III"]
 GI_RATING_OPTIONS_LIST = ["0 - zerowy: IG = 0", "I - niski: IG (0,55]", "II - średni: IG (55,69]",
                           "III - wysoki: IG (69,100]"]
+TRAINING_DURATION_MIN = 1
+TRAINING_DURATION_MAX = 1440

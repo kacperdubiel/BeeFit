@@ -5,7 +5,8 @@ from tkinter import filedialog
 import Controllers.main_controller as main_controller
 from Misc.config import DATE_FORMAT, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_MAX, \
     AGE_MIN, AGE_MAX, ACTIVITY_VALUE_MIN, ACTIVITY_VALUE_MAX, GOAL_VALUE_MIN, GOAL_VALUE_MAX, GRAMMAGE_MIN, \
-    GRAMMAGE_MAX, FOOD_NAME_LENGTH_MIN, FOOD_NAME_LENGTH_MAX, CALORIES_MIN, CALORIES_MAX, GI_RATING_OPTIONS_LIST
+    GRAMMAGE_MAX, FOOD_NAME_LENGTH_MIN, FOOD_NAME_LENGTH_MAX, CALORIES_MIN, CALORIES_MAX, GI_RATING_OPTIONS_LIST, \
+    TRAINING_DURATION_MIN, TRAINING_DURATION_MAX
 from Models.main_model import get_current_date, format_date, convert_to_binary_data
 from Models.user_model import UserModel
 from Views.logged_user_view import LoggedUserView
@@ -16,6 +17,7 @@ from Views.profile_view import SetGenderWindow, SetHeightWindow, SetAgeWindow, S
 from Views.shared_view import show_errorbox
 from Views.user_dishes_view import DeleteDishWindow, AddDishWindow, DeleteDishProductWindow, AddDishProductWindow
 from Views.user_products_view import DeleteProductWindow, AddProductWindow
+from Views.user_trainings_view import DeleteTrainingWindow, AddTrainingWindow
 
 
 class UserController:
@@ -37,6 +39,7 @@ class UserController:
         self.meal_plan_view = self.logged_user_view.meal_plan_view
         self.user_products_view = self.logged_user_view.user_products_view
         self.user_dishes_view = self.logged_user_view.user_dishes_view
+        self.user_trainings_view = self.logged_user_view.user_trainings_view
 
         self.popup_window = None
         self.second_popup_window = None
@@ -44,6 +47,7 @@ class UserController:
         self.configure_meal_plan_view_buttons()
         self.configure_user_products_view_buttons()
         self.configure_user_dishes_view_buttons()
+        self.configure_user_trainings_view_buttons()
 
     def change_user_avatar(self):
         new_avatar_filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Wybierz obrazek",
@@ -97,7 +101,7 @@ class UserController:
 
         grammage = int(grammage)
         if grammage < GRAMMAGE_MIN or grammage > GRAMMAGE_MAX:
-            show_errorbox("Błędna waga", f"Waga musi być z przedziału [{GRAMMAGE_MIN},{GRAMMAGE_MAX}]!")
+            show_errorbox("Błędna waga", f"Waga musi być z przedziału [{GRAMMAGE_MIN},{GRAMMAGE_MAX}] g!")
             return False
 
         return True
@@ -120,7 +124,22 @@ class UserController:
         calories = int(calories)
         if calories < CALORIES_MIN or calories > CALORIES_MAX:
             show_errorbox("Błędna liczba kalorii",
-                          f"Liczba kalorii musi być z przedziału [{CALORIES_MIN},{CALORIES_MAX}]!")
+                          f"Liczba kalorii musi być z przedziału [{CALORIES_MIN},{CALORIES_MAX}] kcal!")
+            return False
+
+        return True
+
+    @staticmethod
+    def correct_duration_value(duration):
+        if not main_controller.is_int(duration):
+            show_errorbox("Błędny czas treningu", f"Czas trwania treningu musi być liczbą całkowitą!")
+            return False
+
+        duration = int(duration)
+        if duration < TRAINING_DURATION_MIN or duration > TRAINING_DURATION_MAX:
+            show_errorbox("Błędny czas treningu",
+                          f"Czas trwania treningu musi być z przedziału "
+                          f"[{TRAINING_DURATION_MIN},{TRAINING_DURATION_MAX}] min!")
             return False
 
         return True
@@ -840,3 +859,104 @@ class UserController:
         str_to_look_for = self.second_popup_window.entry_search.get()
         self.user_model.update_selected_products_ids(str_to_look_for)
         self.second_popup_window.update_products_list(self.user_model.user['selected_products_ids'])
+
+    # --- USER TRAININGS VIEW
+
+    def configure_user_trainings_view_buttons(self):
+        self.user_trainings_view.btn_delete_training.config(
+            command=lambda: self.open_user_trainings_popup_window('delete_training'))
+        self.user_trainings_view.btn_edit_training.config(
+            command=lambda: self.open_user_trainings_popup_window('edit_training'))
+        self.user_trainings_view.btn_add_training.config(
+            command=lambda: self.open_user_trainings_popup_window('add_training'))
+
+    def open_user_trainings_popup_window(self, window_type):
+        if self.popup_window is None:
+            if window_type == "delete_training":
+                if len(self.user_model.user['current_date_trainings']) > 0:
+                    index = self.user_trainings_view.training_selected.get()
+                    training = self.user_model.user['current_date_trainings'][index]
+
+                    self.popup_window = DeleteTrainingWindow(self.master, self.shared_view, training)
+                    self.popup_window.btn_delete_training.config(
+                        command=lambda: self.delete_user_training(training['id_training']))
+            elif window_type == "edit_training":
+                if len(self.user_model.user['current_date_trainings']) > 0:
+                    index = self.user_trainings_view.training_selected.get()
+                    training = self.user_model.user['current_date_trainings'][index]
+
+                    training_types = list()
+                    for training_type in self.user_model.user['training_types']:
+                        training_types.append(training_type['id_training_type'])
+
+                    radio_index = training_types.index(training['id_training_type'])
+
+                    duration = training['duration_in_min']
+
+                    self.popup_window = AddTrainingWindow(self.master, self.shared_view,
+                                                          self.user_model.user['training_types'], radio_index, duration)
+                    self.popup_window.btn_search.config(command=self.search_training_type)
+                    self.popup_window.btn_add_training.config(
+                        command=lambda: self.edit_user_training(training['id_training']))
+            elif window_type == "add_training":
+                self.popup_window = AddTrainingWindow(self.master, self.shared_view,
+                                                      self.user_model.user['training_types'])
+                self.popup_window.btn_search.config(command=self.search_training_type)
+                self.popup_window.btn_add_training.config(command=self.add_user_training)
+
+            if self.popup_window is not None:
+                self.popup_window.protocol('WM_DELETE_WINDOW', self.close_popup_window)
+                self.popup_window.btn_back.config(command=self.close_popup_window)
+
+                self.popup_window.focus_force()
+        else:
+            self.close_popup_window()
+
+    def delete_user_training(self, training_id):
+        self.database_model.delete_training_by_id(training_id)
+
+        self.update_user_trainings()
+
+        self.close_popup_window()
+
+    def search_training_type(self):
+        str_to_look_for = self.popup_window.entry_search.get()
+        self.user_model.update_selected_training_types(str_to_look_for)
+        self.popup_window.default_radio = 0
+        self.popup_window.update_training_types_list(self.user_model.user['selected_training_types'])
+
+    def edit_user_training(self, training_id):
+        index = self.popup_window.training_type_selected.get()
+        new_training_type_id = self.user_model.user['selected_training_types'][index]['id_training_type']
+        new_duration = self.popup_window.entry_duration.get()
+
+        if not self.correct_duration_value(new_duration):
+            return
+
+        self.database_model.update_training(training_id, new_training_type_id, new_duration)
+
+        self.update_user_trainings()
+
+        self.close_popup_window()
+
+    def add_user_training(self):
+        if len(self.user_model.user['selected_training_types']) > 0:
+            index = self.popup_window.training_type_selected.get()
+            training_type_id = self.user_model.user['selected_training_types'][index]['id_training_type']
+
+            duration = self.popup_window.entry_duration.get()
+
+            if not self.correct_duration_value(duration):
+                return
+
+            self.database_model.insert_training(training_type_id, self.user_model.user['id_user'], duration,
+                                                self.user_model.user['current_date'])
+
+            self.update_user_trainings()
+
+        self.close_popup_window()
+
+    def update_user_trainings(self):
+        self.user_model.set_current_date(self.user_model.user['current_date'])
+        self.user_trainings_view.update_trainings()
+        self.logged_user_view.update_user_status_view()

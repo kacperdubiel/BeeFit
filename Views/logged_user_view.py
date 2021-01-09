@@ -9,6 +9,7 @@ from Views.profile_view import ProfileView
 from Views.shared_view import center_window
 from Views.user_dishes_view import UserDishesView
 from Views.user_products_view import UserProductsView
+from Views.user_trainings_view import UserTrainingsView
 
 
 class LoggedUserView(tk.Toplevel):
@@ -164,6 +165,9 @@ class LoggedUserView(tk.Toplevel):
 
         self.user_dishes_view = UserDishesView(self.tab_dishes, self.shared_view, self.user)
         self.user_dishes_view.pack()
+
+        self.user_trainings_view = UserTrainingsView(self.tab_trainings, self.shared_view, self.user)
+        self.user_trainings_view.pack()
 
 
 def _on_tab_changed(event):

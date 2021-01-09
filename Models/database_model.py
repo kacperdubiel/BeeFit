@@ -64,6 +64,9 @@ class DatabaseModel:
     def insert_consumed_dish(self, dish_id, user_id, date, grammage):
         sqlite_db.insert_consumed_dish(self.conn, dish_id, user_id, date, grammage)
 
+    def insert_training(self, training_type_id, id_user, duration, date):
+        sqlite_db.insert_training(self.conn, training_type_id, id_user, duration, date)
+
     # --- SELECT ---
 
     def select_user_by_login(self, login):
@@ -165,6 +168,14 @@ class DatabaseModel:
             trainings.append(self.training_row_to_training_dict(row))
         return trainings
 
+    def select_training_types(self):
+        rows = sqlite_db.select_training_types(self.conn)
+
+        trainings_types = list()
+        for row in rows:
+            trainings_types.append(self.training_types_row_to_training_types_dict(row))
+        return trainings_types
+
     def select_user_consumed_products_at_date(self, id_user, current_date):
         rows = sqlite_db.select_user_consumed_products_at_date(self.conn, id_user, current_date)
 
@@ -230,6 +241,9 @@ class DatabaseModel:
     def update_consumed_dish(self, id_consumed_dish, new_dish_id, new_grammage):
         sqlite_db.update_consumed_dish(self.conn, id_consumed_dish, new_dish_id, new_grammage)
 
+    def update_training(self, id_training, new_training_type_id, new_duration):
+        sqlite_db.update_training(self.conn, id_training, new_training_type_id, new_duration)
+
     # --- DELETE ---
 
     def delete_product_by_id(self, id_user, id_product):
@@ -255,6 +269,9 @@ class DatabaseModel:
 
     def delete_dishes_products_by_dish_id(self, id_dish):
         sqlite_db.delete_dishes_products_by_dish_id(self.conn, id_dish)
+
+    def delete_training_by_id(self, id_training):
+        sqlite_db.delete_training_by_id(self.conn, id_training)
 
     # --- MISC ---
 
@@ -393,9 +410,21 @@ class DatabaseModel:
                 'id_user': row[2],
                 'duration_in_min': row[3],
                 'training_date': row[4],
-                'training_name': row[6],
-                'burned_calories_per_min_per_kg': row[7]
+                'training_name': row[5],
+                'burned_calories_per_min_per_kg': row[6]
             }
             return training
+        else:
+            return None
+
+    @staticmethod
+    def training_types_row_to_training_types_dict(row):
+        if row is not None:
+            training_type = {
+                'id_training_type': row[0],
+                'training_name': row[1],
+                'burned_calories_per_min_per_kg': row[2]
+            }
+            return training_type
         else:
             return None

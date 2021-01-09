@@ -32,7 +32,9 @@ class UserModel:
         self.user['consumed_products'] = self.get_user_consumed_products()
         self.user['consumed_dishes'] = self.get_user_consumed_dishes()
 
+        self.user['training_types'] = self.get_training_types()
         self.user['current_date_trainings'] = self.get_user_current_date_trainings()
+        self.user['selected_training_types'] = self.get_selected_training_types()
 
         self.user['calories_to_consume'] = self.get_calories_to_consume()
         self.user['calories_consumed'] = self.get_calories_consumed()
@@ -122,10 +124,30 @@ class UserModel:
         current_trainings = self.database_model.select_user_trainings_at_date(self.user['id_user'],
                                                                               self.user['current_date'])
         for training in current_trainings:
-            training['burned_calories'] = int(training['burned_calories_per_min_per_kg'] * training['duration_in_min']
-                                              * self.user['current_date_weight']['weight_value'])
+            training['burned_calories_per_min'] = int(training['burned_calories_per_min_per_kg']
+                                                      * self.user['current_date_weight']['weight_value'])
+            training['burned_calories'] = int(training['burned_calories_per_min'] * training['duration_in_min'])
+            training['duration_hours'] = training['duration_in_min'] // 60
+            training['duration_minutes'] = training['duration_in_min'] % 60
 
         return current_trainings
+
+    def get_training_types(self):
+        training_types = self.database_model.select_training_types()
+        for training_type in training_types:
+            training_type['burned_calories_per_min'] = int(training_type['burned_calories_per_min_per_kg']
+                                                           * self.user['current_date_weight']['weight_value'])
+        return training_types
+
+    def get_selected_training_types(self, str_to_look_for=""):
+        found_training_types = list()
+        for training in self.user['training_types']:
+            training_name = training['training_name']
+            str_to_look_for = str_to_look_for.lower()
+            training_name = training_name.lower()
+            if str_to_look_for in training_name:
+                found_training_types.append(training)
+        return found_training_types
 
     def get_calories_to_consume(self):
         calories_to_consume = self.user['current_date_gda']['gda_value']
@@ -203,6 +225,9 @@ class UserModel:
 
     def update_selected_dishes_ids(self, str_to_look_for):
         self.user['selected_dishes_ids'] = self.get_user_selected_dishes_ids(str_to_look_for)
+
+    def update_selected_training_types(self, str_to_look_for):
+        self.user['selected_training_types'] = self.get_selected_training_types(str_to_look_for)
 
 
 # --- STATIC METHODS ---
