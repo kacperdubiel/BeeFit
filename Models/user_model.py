@@ -124,8 +124,8 @@ class UserModel:
         current_trainings = self.database_model.select_user_trainings_at_date(self.user['id_user'],
                                                                               self.user['current_date'])
         for training in current_trainings:
-            training['burned_calories_per_min'] = int(training['burned_calories_per_min_per_kg']
-                                                      * self.user['current_date_weight']['weight_value'])
+            training['burned_calories_per_min'] = round(training['burned_calories_per_min_per_kg']
+                                                        * self.user['current_date_weight']['weight_value'], 2)
             training['burned_calories'] = int(training['burned_calories_per_min'] * training['duration_in_min'])
             training['duration_hours'] = training['duration_in_min'] // 60
             training['duration_minutes'] = training['duration_in_min'] % 60
@@ -135,14 +135,14 @@ class UserModel:
     def get_training_types(self):
         training_types = self.database_model.select_training_types()
         for training_type in training_types:
-            training_type['burned_calories_per_min'] = int(training_type['burned_calories_per_min_per_kg']
-                                                           * self.user['current_date_weight']['weight_value'])
+            training_type['burned_calories_per_min'] = round(training_type['burned_calories_per_min_per_kg']
+                                                             * self.user['current_date_weight']['weight_value'], 2)
         return training_types
 
     def update_training_types_burned_calories(self):
         for training_type in self.user['training_types']:
-            training_type['burned_calories_per_min'] = int(training_type['burned_calories_per_min_per_kg']
-                                                           * self.user['current_date_weight']['weight_value'])
+            training_type['burned_calories_per_min'] = round(training_type['burned_calories_per_min_per_kg']
+                                                             * self.user['current_date_weight']['weight_value'], 2)
 
     def get_selected_training_types(self, str_to_look_for=""):
         found_training_types = list()
