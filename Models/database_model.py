@@ -145,8 +145,10 @@ class DatabaseModel:
                 dish_grammage += d_prod_dict['product_grammage']
                 dish['products'].append(d_prod_dict)
 
-            if dish_grammage > 0:
-                dish['calories'] = int((dish_calories * 100) / dish_grammage)
+            dish['grammage'] = dish_grammage
+            dish['calories'] = dish_calories
+            if dish['grammage'] > 0:
+                dish['calories_per_100g'] = int((dish_calories * 100) / dish['grammage'])
             else:
                 dish['calories'] = 0
             dishes.append(dish)

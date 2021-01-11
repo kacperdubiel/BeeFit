@@ -582,14 +582,14 @@ class AddConsumedDishWindow(tk.Toplevel):
         self.canvas_dishes.pack(side="left", fill="both", expand=1)
         self.scrollbar_dishes.pack(side="right", fill="y")
 
-        frame_sizer = Frame(self.frame_main, width=540)
+        frame_sizer = Frame(self.frame_main, width=580)
         frame_sizer.pack()
 
     def _fill_container_with_dishes(self, dishes_ids):
         self.frame_dishes = Frame(self.frame_scrollable)
         self.frame_dishes.pack(fill="both", expand=1)
 
-        frame_sizer = Frame(self.frame_dishes, width=517)
+        frame_sizer = Frame(self.frame_dishes, width=557)
         frame_sizer.pack()
 
         self.dishes_images = []
@@ -643,14 +643,27 @@ class AddConsumedDishWindow(tk.Toplevel):
                                     font=self.shared_view.font_style_10)
             label_gi_rating.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
+            # Grammage
+            frame_grammage = Frame(frame_dish, relief="ridge", bd=1)
+            frame_grammage.grid(row=0, column=4, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+
+            frame_center = Frame(frame_grammage)
+            frame_center.pack()
+
+            label_grammage = Label(frame_center, text=f"{self.user_dishes[f'{dish_id}']['grammage']} g",
+                                   font=self.shared_view.font_style_10)
+            label_grammage.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
+
             # Calories
             frame_calories = Frame(frame_dish, relief="ridge", bd=1)
-            frame_calories.grid(row=0, column=4, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
+            frame_calories.grid(row=0, column=5, padx=(0, self.shared_view.SMALL_PAD), pady=self.shared_view.SMALL_PAD)
 
             frame_center = Frame(frame_calories)
             frame_center.pack()
 
-            label_calories = Label(frame_center, text=f"{self.user_dishes[f'{dish_id}']['calories']} kcal/100g",
+            label_calories = Label(frame_center,
+                                   text=f"{self.user_dishes[f'{dish_id}']['calories']} kcal "
+                                        f"({self.user_dishes[f'{dish_id}']['calories_per_100g']} kcal/100g)",
                                    font=self.shared_view.font_style_10)
             label_calories.pack(padx=self.shared_view.SMALL_PAD, pady=self.shared_view.SMALL_PAD)
 
