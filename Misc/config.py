@@ -3,7 +3,8 @@ DB_NAME = 'database'
 
 TRAINING_TYPES_JSON_PATH = "Database/training_types.json"
 
-DATE_FORMAT = "%d/%m/%Y"
+DATE_FORMAT = "%Y/%m/%d"
+DATE_FORMAT_IN_CALENDAR = "y/mm/dd"
 DATETIME_FORMAT = "%d/%m/%Y %H:%M:%S"
 
 # IMGs

@@ -217,8 +217,9 @@ class UserModel:
         self.user['weight'] = self.get_user_weight()
 
     def eval_gda_from_current_data(self):
-        return evaluate_gda(self.user['gender'], float(self.user['weight']['weight_value']), float(self.user['height']),
-                            int(self.user['age']), int(self.user['physical_activity']), int(self.user['goal']))
+        return evaluate_gda(self.user['gender'], float(self.user['current_date_weight']['weight_value']),
+                            float(self.user['height']), int(self.user['age']), int(self.user['physical_activity']),
+                            int(self.user['goal']))
 
     def update_gda(self):
         self.user['gda'] = self.get_user_gda()

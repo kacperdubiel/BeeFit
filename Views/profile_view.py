@@ -4,7 +4,7 @@ from tkinter import ttk
 
 from PIL import ImageTk, Image
 
-from Misc.config import IMG_PATH_PENCIL_ICON, IMG_PATH_PLUS_ICON, IMG_PATH_COG_ICON, ACTIVITY_OPTIONS, GOAL_OPTIONS
+from Misc.config import IMG_PATH_PENCIL_ICON, IMG_PATH_PLUS_ICON, ACTIVITY_OPTIONS, GOAL_OPTIONS
 from Views.shared_view import center_window
 
 
@@ -24,10 +24,6 @@ class ProfileView(ttk.Frame):
         self.image_plus = Image.open(IMG_PATH_PLUS_ICON).resize((self.shared_view.ICON_SIZE,
                                                                  self.shared_view.ICON_SIZE), Image.ANTIALIAS)
         self.icon_plus = ImageTk.PhotoImage(self.image_plus)
-
-        self.image_cog = Image.open(IMG_PATH_COG_ICON).resize((self.shared_view.ICON_SIZE,
-                                                               self.shared_view.ICON_SIZE), Image.ANTIALIAS)
-        self.icon_cog = ImageTk.PhotoImage(self.image_cog)
 
         self._create_left_block()
         self._create_right_block()
@@ -86,7 +82,7 @@ class ProfileView(ttk.Frame):
         self.label_weight = Label(self.frame_weight, text=f"Waga [kg]: ", font=self.shared_view.font_style_12_bold)
         self.label_weight.pack(side="left")
 
-        self.label_weight_value = Label(self.frame_weight, text=f"{self.user['weight']['weight_value']}",
+        self.label_weight_value = Label(self.frame_weight, text=f"{self.user['current_date_weight']['weight_value']}",
                                         font=self.shared_view.font_style_12)
         self.label_weight_value.pack(side="left", padx=(0, self.shared_view.VERY_SMALL_PAD))
 
@@ -104,7 +100,7 @@ class ProfileView(ttk.Frame):
                                         font=self.shared_view.font_style_12)
         self.label_height_value.pack(side="left", padx=(0, self.shared_view.VERY_SMALL_PAD))
 
-        self.btn_set_height = tk.Button(self.frame_height, image=self.icon_cog)
+        self.btn_set_height = tk.Button(self.frame_height, image=self.icon_pencil)
         self.btn_set_height.pack(side="left")
 
         # Age
@@ -161,7 +157,7 @@ class ProfileView(ttk.Frame):
                                font=self.shared_view.font_style_12_bold)
         self.label_gda.pack(side="left")
 
-        self.label_gda_value = Label(self.frame_gda, text=f"{self.user['gda']['gda_value']} kcal",
+        self.label_gda_value = Label(self.frame_gda, text=f"{self.user['current_date_gda']['gda_value']} kcal",
                                      font=self.shared_view.font_style_12)
         self.label_gda_value.pack(side="left")
 
@@ -177,7 +173,7 @@ class ProfileView(ttk.Frame):
         self.label_gender_value.configure(text=f"{self.user['gender']}")
 
     def update_weight(self):
-        self.label_weight_value.configure(text=f"{self.user['weight']['weight_value']}")
+        self.label_weight_value.configure(text=f"{self.user['current_date_weight']['weight_value']}")
 
     def update_height(self):
         self.label_height_value.configure(text=f"{self.user['height']}")
@@ -194,7 +190,7 @@ class ProfileView(ttk.Frame):
         self.label_goal_value.configure(text=f"{GOAL_OPTIONS[int(goal_id) - 1]}")
 
     def update_gda(self):
-        self.label_gda_value.configure(text=f"{self.user['gda']['gda_value']} kcal")
+        self.label_gda_value.configure(text=f"{self.user['current_date_gda']['gda_value']} kcal")
 
 
 class SetGenderWindow(tk.Toplevel):

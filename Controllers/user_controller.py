@@ -9,7 +9,7 @@ from Misc.config import DATE_FORMAT, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_
     TRAINING_DURATION_MIN, TRAINING_DURATION_MAX
 from Models.main_model import get_current_date, format_date, convert_to_binary_data
 from Models.user_model import UserModel
-from Views.logged_user_view import LoggedUserView
+from Views.logged_user_view import LoggedUserView, SetDateWindow
 from Views.meal_plan_view import DeleteConsumedProductWindow, AddConsumedProductWindow, DeleteConsumedDishWindow, \
     AddConsumedDishWindow
 from Views.profile_view import SetGenderWindow, SetHeightWindow, SetAgeWindow, SetWeightWindow, SetActivityWindow, \
@@ -34,6 +34,7 @@ class UserController:
         self.logged_user_view.btn_set_to_today.config(command=self.set_to_todays_date)
         self.logged_user_view.btn_prev_date.config(command=self.set_to_prev_day_date)
         self.logged_user_view.btn_next_date.config(command=self.set_to_next_day_date)
+        self.logged_user_view.btn_set_date.config(command=self.open_set_date_window)
 
         self.profile_view = self.logged_user_view.profile_view
         self.meal_plan_view = self.logged_user_view.meal_plan_view
@@ -57,6 +58,8 @@ class UserController:
             self.user_model.set_user_avatar(new_avatar)
             self.logged_user_view.update_user_avatar()
 
+    # --- DATE ---
+
     def set_to_todays_date(self):
         new_date = get_current_date()
         self.set_current_date(new_date)
@@ -77,7 +80,35 @@ class UserController:
         self.meal_plan_view.update_consumed_dishes()
 
         self.logged_user_view.update_user_status_view()
+        self.profile_view.update_weight()
+        self.profile_view.update_gda()
+        self.user_trainings_view.update_trainings()
         self.close_popup_window()
+
+    def set_date(self):
+        calendar_date = self.popup_window.calendar.get_date()
+        self.set_current_date(calendar_date)
+
+    def open_set_date_window(self):
+        if self.popup_window is None:
+            current_date_string = self.user_model.user['current_date']
+            date = datetime.strptime(current_date_string, DATE_FORMAT)
+            current_date = {
+                'day': date.day,
+                'month': date.month,
+                'year': date.year
+            }
+
+            self.popup_window = SetDateWindow(self.master, self.shared_view, current_date)
+            self.popup_window.btn_set_date.config(command=self.set_date)
+
+            if self.popup_window is not None:
+                self.popup_window.protocol('WM_DELETE_WINDOW', self.close_popup_window)
+                self.popup_window.btn_back.config(command=self.close_popup_window)
+
+                self.popup_window.focus_force()
+        else:
+            self.close_popup_window()
 
     def close_popup_window(self):
         self.close_second_popup_window()
@@ -225,7 +256,7 @@ class UserController:
             show_errorbox("Błędna waga", f"Waga musi być z przedziału [{WEIGHT_MIN},{WEIGHT_MAX}]!")
             return
 
-        current_date = get_current_date()
+        current_date = self.user_model.user['current_date']
         current_day_weight = self.database_model.select_user_weight_by_date(self.user_model.user['id_user'],
                                                                             current_date)
         update_weight = False
@@ -239,7 +270,7 @@ class UserController:
             update_weight = True
 
         if update_weight:
-            self.user_model.update_weight()
+            self.user_model.set_current_date(self.user_model.user['current_date'])
             self.profile_view.update_weight()
 
         self.close_popup_window()
@@ -322,23 +353,22 @@ class UserController:
 
     def eval_user_gda(self):
         new_gda = self.user_model.eval_gda_from_current_data()
-        old_gda = self.user_model.user['gda']
+        old_gda = self.user_model.user['current_date_gda']
 
-        current_date = get_current_date()
+        current_date = self.user_model.user['current_date']
 
         update_data = False
         if current_date == old_gda['gda_date']:
             if old_gda['gda_value'] != new_gda:
                 self.database_model.update_user_gda_on_date(self.user_model.user['id_user'], current_date, new_gda)
                 update_data = True
-        elif old_gda['gda_date'] < current_date:
+        else:
             self.database_model.insert_gda(self.user_model.user['id_user'], new_gda, current_date)
             update_data = True
 
         if update_data:
-            self.user_model.update_gda()
-            self.profile_view.update_gda()
             self.user_model.set_current_date(self.user_model.user['current_date'])
+            self.profile_view.update_gda()
             self.logged_user_view.update_user_status_view()
 
         self.close_popup_window()

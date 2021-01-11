@@ -3,7 +3,9 @@ from tkinter import *
 from tkinter import ttk
 
 from PIL import ImageTk
+from tkcalendar import *
 
+from Misc.config import DATE_FORMAT_IN_CALENDAR
 from Views.meal_plan_view import MealPlanView
 from Views.profile_view import ProfileView
 from Views.shared_view import center_window
@@ -92,9 +94,10 @@ class LoggedUserView(tk.Toplevel):
                                        font=self.shared_view.font_style_10)
         self.btn_next_date.pack(side='right', padx=(self.shared_view.SMALL_PAD, 0))
 
-        self.label_current_date = Label(self.frame_top_right_block_second_row, text=f"{self.user['current_date']}",
-                                        font=self.shared_view.font_style_10)
-        self.label_current_date.pack(side="right", padx=(self.shared_view.SMALL_PAD, 0))
+        self.btn_set_date = tk.Button(self.frame_top_right_block_second_row,
+                                      text=f"{self.user['current_date']}",
+                                      font=self.shared_view.font_style_10)
+        self.btn_set_date.pack(side='right', padx=(self.shared_view.SMALL_PAD, 0))
 
         self.btn_prev_date = tk.Button(self.frame_top_right_block_second_row,
                                        text="<",
@@ -124,7 +127,7 @@ class LoggedUserView(tk.Toplevel):
         self.progressbar_calories['value'] = self.user['progressbar_percent']
 
     def update_user_status_view(self):
-        self.label_current_date.configure(text=f"{self.user['current_date']}")
+        self.btn_set_date.configure(text=f"{self.user['current_date']}")
         self.label_calories_consumed.configure(text=f"Spożyto: {self.user['calories_consumed']} kcal")
         self.label_calories_left.configure(text=f"Pozostało: {self.user['calories_left']} kcal")
 
@@ -168,6 +171,48 @@ class LoggedUserView(tk.Toplevel):
 
         self.user_trainings_view = UserTrainingsView(self.tab_trainings, self.shared_view, self.user)
         self.user_trainings_view.pack()
+
+
+class SetDateWindow(tk.Toplevel):
+    def __init__(self, master, shared_view, current_date):
+        tk.Toplevel.__init__(self, master)
+        self.shared_view = shared_view
+        self.current_date = current_date
+        self.withdraw()
+
+        self.title('BeeFit - Ustaw datę')
+        self.resizable(False, False)
+
+        self.frame_main = ttk.Frame(self)
+        self.frame_main.pack(padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
+
+        self._create_calendar()
+        self._create_buttons()
+
+        center_window(self)
+        self.deiconify()
+
+    def _create_calendar(self):
+        frame_calendar = LabelFrame(self.frame_main, text="Wybierz datę:", font=self.shared_view.font_style_10_bold)
+        frame_calendar.pack(fill="both", expand=1)
+
+        self.calendar = Calendar(frame_calendar, selectmode="day", year=self.current_date['year'],
+                                 month=self.current_date['month'], day=self.current_date['day'],
+                                 date_pattern=DATE_FORMAT_IN_CALENDAR)
+        self.calendar.pack(fill="both", padx=self.shared_view.NORMAL_PAD, pady=(self.shared_view.SMALL_PAD,
+                                                                                self.shared_view.NORMAL_PAD))
+
+    def _create_buttons(self):
+        self.frame_buttons = ttk.Frame(self.frame_main)
+        self.frame_buttons.pack()
+
+        self.btn_back = tk.Button(self.frame_buttons, text="Powrót", width=self.shared_view.btn_size,
+                                  font=self.shared_view.font_style_12)
+        self.btn_back.pack(side='left', padx=(0, self.shared_view.NORMAL_PAD), pady=(self.shared_view.NORMAL_PAD, 0))
+
+        self.btn_set_date = tk.Button(self.frame_buttons, text="Wybierz", width=self.shared_view.btn_size,
+                                      font=self.shared_view.font_style_12)
+        self.btn_set_date.pack(side='left', pady=(self.shared_view.NORMAL_PAD, 0))
 
 
 def _on_tab_changed(event):
