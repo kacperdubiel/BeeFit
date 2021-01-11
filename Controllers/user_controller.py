@@ -85,13 +85,15 @@ class UserController:
             self.popup_window.destroy()
             self.popup_window = None
 
+        str_to_find = self.user_products_view.entry_search.get()
+        self.user_model.update_selected_products_ids(str_to_find)
+        self.update_products()
+
         str_to_find = self.user_dishes_view.entry_search.get()
         self.user_model.update_selected_dishes_ids(str_to_find)
         self.update_dishes()
 
-        str_to_find = self.user_products_view.entry_search.get()
-        self.user_model.update_selected_products_ids(str_to_find)
-        self.update_products()
+        self.update_user_trainings()
 
     @staticmethod
     def correct_grammage_value(grammage):

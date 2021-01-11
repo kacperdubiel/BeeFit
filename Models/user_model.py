@@ -139,6 +139,11 @@ class UserModel:
                                                            * self.user['current_date_weight']['weight_value'])
         return training_types
 
+    def update_training_types_burned_calories(self):
+        for training_type in self.user['training_types']:
+            training_type['burned_calories_per_min'] = int(training_type['burned_calories_per_min_per_kg']
+                                                           * self.user['current_date_weight']['weight_value'])
+
     def get_selected_training_types(self, str_to_look_for=""):
         found_training_types = list()
         for training in self.user['training_types']:
@@ -195,6 +200,7 @@ class UserModel:
         self.user['consumed_dishes'] = self.get_user_consumed_dishes()
 
         self.user['current_date_trainings'] = self.get_user_current_date_trainings()
+        self.update_training_types_burned_calories()
 
         self.user['calories_to_consume'] = self.get_calories_to_consume()
         self.user['calories_consumed'] = self.get_calories_consumed()
