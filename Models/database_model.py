@@ -90,10 +90,6 @@ class DatabaseModel:
         row = sqlite_db.select_user_weight(self.conn, id_user)
         return self.weight_row_to_weight_dict(row)
 
-    def select_user_weight_by_date(self, id_user, date):
-        row = sqlite_db.select_user_weight_by_date(self.conn, id_user, date)
-        return self.weight_row_to_weight_dict(row)
-
     def select_first_weight_before_date(self, id_user, current_date):
         row = sqlite_db.select_first_weight_before_date(self.conn, id_user, current_date)
         return self.weight_row_to_weight_dict(row)
@@ -187,6 +183,7 @@ class DatabaseModel:
             c_prod['image'] = get_image_from_bytes(c_prod['image'])
             c_prod['calories'] = int(float(c_prod['calories']) / 100 * c_prod['product_grammage'])
             consumed_products.append(c_prod)
+
         return consumed_products
 
     def select_user_consumed_dishes_at_date(self, id_user, current_date):

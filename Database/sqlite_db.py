@@ -235,18 +235,6 @@ def select_user_weight(conn, user_login):
 
 
 @connect
-def select_user_weight_by_date(conn, user_login, date):
-    sql = """
-          SELECT * FROM Weights WHERE IdUser=? AND WeightDate=?
-          """
-    cursor = conn.cursor()
-    cursor.execute(sql, (user_login, date))
-
-    row = cursor.fetchone()
-    return row
-
-
-@connect
 def select_first_weight_before_date(conn, id_user, current_date):
     sql = """
           SELECT * FROM Weights WHERE IdUser=? AND WeightDate<=? ORDER BY WeightDate DESC LIMIT 1

@@ -8,6 +8,7 @@ from tkcalendar import *
 from Misc.config import DATE_FORMAT_IN_CALENDAR
 from Views.meal_plan_view import MealPlanView
 from Views.profile_view import ProfileView
+from Views.raports_view import RaportsView
 from Views.shared_view import center_window
 from Views.user_dishes_view import UserDishesView
 from Views.user_products_view import UserProductsView
@@ -171,6 +172,9 @@ class LoggedUserView(tk.Toplevel):
 
         self.user_trainings_view = UserTrainingsView(self.tab_trainings, self.shared_view, self.user)
         self.user_trainings_view.pack()
+
+        self.raports_view = RaportsView(self.tab_raports, self.shared_view, self.user)
+        self.raports_view.pack()
 
 
 class SetDateWindow(tk.Toplevel):

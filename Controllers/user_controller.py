@@ -41,6 +41,7 @@ class UserController:
         self.user_products_view = self.logged_user_view.user_products_view
         self.user_dishes_view = self.logged_user_view.user_dishes_view
         self.user_trainings_view = self.logged_user_view.user_trainings_view
+        self.raports_view = self.logged_user_view.raports_view
 
         self.popup_window = None
         self.second_popup_window = None
@@ -74,20 +75,24 @@ class UserController:
         new_date = curr_date + timedelta(days=1)
         self.set_current_date(format_date(new_date))
 
+    def set_date(self):
+        calendar_date = self.popup_window.calendar.get_date()
+        self.set_current_date(calendar_date)
+
     def set_current_date(self, new_date):
+        # Update data
         self.user_model.set_current_date(new_date)
+
+        # Update views
         self.meal_plan_view.update_consumed_products()
         self.meal_plan_view.update_consumed_dishes()
-
         self.logged_user_view.update_user_status_view()
         self.profile_view.update_weight()
         self.profile_view.update_gda()
         self.user_trainings_view.update_trainings()
-        self.close_popup_window()
+        self.raports_view.update_raports()
 
-    def set_date(self):
-        calendar_date = self.popup_window.calendar.get_date()
-        self.set_current_date(calendar_date)
+        self.close_popup_window()
 
     def open_set_date_window(self):
         if self.popup_window is None:
@@ -125,6 +130,7 @@ class UserController:
         self.update_dishes()
 
         self.update_user_trainings()
+        self.raports_view.update_raports()
 
     @staticmethod
     def correct_grammage_value(grammage):
@@ -197,7 +203,7 @@ class UserController:
                 self.popup_window.btn_set_gender.config(command=self.set_user_gender)
             elif window_type == 'weight':
                 self.popup_window = SetWeightWindow(self.master, self.shared_view,
-                                                    self.user_model.user['weight']['weight_value'])
+                                                    self.user_model.user['current_date_weight']['weight_value'])
                 self.popup_window.btn_set_weight.config(command=self.set_user_weight)
             elif window_type == 'height':
                 self.popup_window = SetHeightWindow(self.master, self.shared_view, self.user_model.user['height'])
@@ -992,3 +998,5 @@ class UserController:
         self.user_model.set_current_date(self.user_model.user['current_date'])
         self.user_trainings_view.update_trainings()
         self.logged_user_view.update_user_status_view()
+
+    # --- RAPORTS VIEW ---
