@@ -1,7 +1,7 @@
 import Controllers.main_controller as main_controller
 from Controllers.user_controller import UserController
-from Misc.config import IMG_PATH_NO_PHOTO, PASSWORD_LENGTH_MIN, PASSWORD_LENGTH_MAX, EMAIL_LENGTH_MIN, EMAIL_LENGTH_MAX, \
-    GENDER_FEMALE, GENDER_MALE, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_MAX, \
+from Misc.config import IMG_PATH_NO_PHOTO, PASSWORD_LENGTH_MIN, PASSWORD_LENGTH_MAX, EMAIL_LENGTH_MIN, \
+    EMAIL_LENGTH_MAX, GENDER_FEMALE, GENDER_MALE, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_MAX, \
     AGE_MIN, AGE_MAX, ACTIVITY_VALUE_MIN, ACTIVITY_VALUE_MAX, GOAL_VALUE_MIN, GOAL_VALUE_MAX, \
     LOGIN_LENGTH_MIN, LOGIN_LENGTH_MAX
 from Models.main_model import convert_to_binary_data, get_current_date, evaluate_gda

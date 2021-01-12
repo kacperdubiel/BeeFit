@@ -606,7 +606,7 @@ class UserController:
         self.close_popup_window()
 
     def search_product(self):
-        self.user_products_view.update_products()
+        self.update_products()
 
     def edit_product(self, product_id):
         new_name = self.popup_window.entry_name.get()
@@ -755,9 +755,7 @@ class UserController:
         self.close_popup_window()
 
     def search_dish(self):
-        str_to_find = self.user_dishes_view.entry_search.get()
-        self.user_model.update_selected_dishes_ids(str_to_find)
-        self.user_dishes_view.update_dishes()
+        self.update_dishes()
 
     def edit_dish(self, dish_id, products_ids_list, products_grammage_list):
         new_name = self.popup_window.entry_name.get()
@@ -933,12 +931,14 @@ class UserController:
 
                     self.popup_window = AddTrainingWindow(self.master, self.shared_view,
                                                           self.user_model.user['training_types'], radio_index, duration)
+                    self.search_training_type()
                     self.popup_window.btn_search.config(command=self.search_training_type)
                     self.popup_window.btn_add_training.config(
                         command=lambda: self.edit_user_training(training['id_training']))
             elif window_type == "add_training":
                 self.popup_window = AddTrainingWindow(self.master, self.shared_view,
                                                       self.user_model.user['training_types'])
+                self.search_training_type()
                 self.popup_window.btn_search.config(command=self.search_training_type)
                 self.popup_window.btn_add_training.config(command=self.add_user_training)
 

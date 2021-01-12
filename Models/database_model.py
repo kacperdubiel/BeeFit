@@ -30,7 +30,7 @@ class DatabaseModel:
 
         training_types_list = list()
         for t in training_types_dict:
-            training_types_list.append((t['training_name'], t['burned_calories_per_hour']))
+            training_types_list.append((t['training_name'], t['burned_calories_per_min_per_kg']))
 
         sqlite_db.insert_many_training_types(self.conn, training_types_list)
 

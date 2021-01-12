@@ -1,58 +1,58 @@
 [
   {
     "training_name": "Gimnastyka",
-    "burned_calories_per_hour": 0.050
+    "burned_calories_per_min_per_kg": 0.050
   },
   {
     "training_name": "Pływanie",
-    "burned_calories_per_hour": 0.070
+    "burned_calories_per_min_per_kg": 0.070
   },
   {
     "training_name": "Spacer",
-    "burned_calories_per_hour": 0.048
+    "burned_calories_per_min_per_kg": 0.048
   },
   {
     "training_name": "Ćwiczenia siłowe",
-    "burned_calories_per_hour": 0.062
+    "burned_calories_per_min_per_kg": 0.062
   },
   {
     "training_name": "Taniec",
-    "burned_calories_per_hour": 0.080
+    "burned_calories_per_min_per_kg": 0.080
   },
   {
     "training_name": "Koszykówka",
-    "burned_calories_per_hour": 0.217
+    "burned_calories_per_min_per_kg": 0.217
   },
   {
     "training_name": "Siatkówka",
-    "burned_calories_per_hour": 0.075
+    "burned_calories_per_min_per_kg": 0.075
   },
   {
     "training_name": "Piłka nożna",
-    "burned_calories_per_hour": 0.131
+    "burned_calories_per_min_per_kg": 0.131
   },
   {
     "training_name": "Bieganie (8 km/h)",
-    "burned_calories_per_hour": 0.136
+    "burned_calories_per_min_per_kg": 0.136
   },
   {
     "training_name": "Bieganie (12 km/h)",
-    "burned_calories_per_hour": 0.180
+    "burned_calories_per_min_per_kg": 0.180
   },
   {
     "training_name": "Bieganie (15 km/h)",
-    "burned_calories_per_hour": 0.188
+    "burned_calories_per_min_per_kg": 0.188
   },
   {
     "training_name": "Jazda na rowerze (9 km/h)",
-    "burned_calories_per_hour": 0.06
+    "burned_calories_per_min_per_kg": 0.06
   },
   {
     "training_name": "Jazda na rowerze (12-13 km/h)",
-    "burned_calories_per_hour": 0.114
+    "burned_calories_per_min_per_kg": 0.114
   },
   {
     "training_name": "Jazda na rowerze (24 km/h)",
-    "burned_calories_per_hour": 0.171
+    "burned_calories_per_min_per_kg": 0.171
   }
 ]
