@@ -259,6 +259,18 @@ def select_first_weight_after_date(conn, id_user, current_date):
 
 
 @connect
+def select_user_weight_by_date(conn, id_user, date):
+    sql = """
+          SELECT * FROM Weights WHERE IdUser=? AND WeightDate=? LIMIT 1
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql, (id_user, date))
+
+    row = cursor.fetchone()
+    return row
+
+
+@connect
 def select_user_gda(conn, user_login):
     sql = """
           SELECT * FROM GDAs WHERE IdUser=? ORDER BY GDADate DESC LIMIT 1

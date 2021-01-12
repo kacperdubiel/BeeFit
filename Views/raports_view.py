@@ -42,7 +42,7 @@ class RaportsView(ttk.Frame):
         fig = Figure(figsize=(6, 4), dpi=90)
 
         a = fig.add_subplot(111)
-        a.plot(month_values, weight_values, color="orange", linewidth=2, markersize=6, marker='o')
+        a.plot(month_values, weight_values, color="orange", linewidth=2)
 
         a.set_ylabel("Waga [kg]", fontsize=10)
         a.set_xlabel("Dni", fontsize=10)

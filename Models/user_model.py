@@ -152,8 +152,9 @@ class UserModel:
         consumed_dishes = self.database_model.select_user_consumed_dishes_at_date(self.user['id_user'], date)
         for c_dish in consumed_dishes:
             id_dish = c_dish['id_dish']
-            dish_calories_per_100g = self.user['dishes'][f'{id_dish}']['calories']
-            c_dish['calories'] = int(c_dish['dish_grammage'] * (float(dish_calories_per_100g) / 100))
+            dish_calories_per_100g = self.user['dishes'][f'{id_dish}']['calories_per_100g']
+            grammage_consumed = c_dish['dish_grammage']
+            c_dish['calories'] = int((dish_calories_per_100g * grammage_consumed) / 100)
 
         return consumed_dishes
 

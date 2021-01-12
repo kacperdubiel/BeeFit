@@ -98,6 +98,10 @@ class DatabaseModel:
         row = sqlite_db.select_first_weight_after_date(self.conn, id_user, current_date)
         return self.weight_row_to_weight_dict(row)
 
+    def select_user_weight_by_date(self, id_user, date):
+        row = sqlite_db.select_user_weight_by_date(self.conn, id_user, date)
+        return self.weight_row_to_weight_dict(row)
+
     def select_user_gda(self, id_user):
         row = sqlite_db.select_user_gda(self.conn, id_user)
         return self.gda_row_to_gda_dict(row)
