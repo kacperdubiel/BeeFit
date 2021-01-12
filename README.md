@@ -9,5 +9,5 @@ Funkcje:
 [+] Dodawanie własnych produktów  
 [+] Tworzenie dań z dodanych wcześniej produtków  
 [+] Uwzględnienie ukończonych treningów w ciągu dnia z wyliczeniem spalonych kalorii  
-[-] Raporty w postaci wykresów odnoszące się do zmian wagi użytkownika oraz różnicy pomiędzy spożytymi a spalonymi
+[+] Raporty w postaci wykresów odnoszące się do zmian wagi użytkownika oraz różnicy pomiędzy spożytymi a spalonymi
 kaloriami
