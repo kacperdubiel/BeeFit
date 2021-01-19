@@ -4,7 +4,8 @@ from tkinter import ttk
 
 from PIL import ImageTk, Image
 
-from Misc.config import IMG_PATH_PENCIL_ICON, IMG_PATH_PLUS_ICON, ACTIVITY_OPTIONS, GOAL_OPTIONS
+from Misc.config import IMG_PATH_PENCIL_ICON, IMG_PATH_PLUS_ICON, ACTIVITY_OPTIONS, GOAL_OPTIONS, GENDER_MALE, \
+    GENDER_FEMALE
 from Views.shared_view import center_window
 
 
@@ -221,12 +222,12 @@ class SetGenderWindow(tk.Toplevel):
         self.frame_gender.pack(padx=self.shared_view.NORMAL_PAD, pady=self.shared_view.NORMAL_PAD)
 
         self.gender_value = tk.StringVar(value=self.current_gender)
-        self.gender_radio_btn1 = Radiobutton(self.frame_gender, text="Mężczyzna", variable=self.gender_value, value="M",
-                                             font=self.shared_view.font_style_12)
+        self.gender_radio_btn1 = Radiobutton(self.frame_gender, text="Mężczyzna", variable=self.gender_value,
+                                             value=GENDER_MALE, font=self.shared_view.font_style_12)
         self.gender_radio_btn1.pack(side='left')
 
-        self.gender_radio_btn2 = Radiobutton(self.frame_gender, text="Kobieta", variable=self.gender_value, value="K",
-                                             font=self.shared_view.font_style_12)
+        self.gender_radio_btn2 = Radiobutton(self.frame_gender, text="Kobieta", variable=self.gender_value,
+                                             value=GENDER_FEMALE, font=self.shared_view.font_style_12)
         self.gender_radio_btn2.pack(side='left')
 
     def _create_buttons(self):

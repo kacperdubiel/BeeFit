@@ -6,7 +6,7 @@ import Controllers.main_controller as main_controller
 from Misc.config import DATE_FORMAT, WEIGHT_MIN, WEIGHT_MAX, HEIGHT_MIN, HEIGHT_MAX, \
     AGE_MIN, AGE_MAX, ACTIVITY_VALUE_MIN, ACTIVITY_VALUE_MAX, GOAL_VALUE_MIN, GOAL_VALUE_MAX, GRAMMAGE_MIN, \
     GRAMMAGE_MAX, FOOD_NAME_LENGTH_MIN, FOOD_NAME_LENGTH_MAX, CALORIES_MIN, CALORIES_MAX, GI_RATING_OPTIONS_LIST, \
-    TRAINING_DURATION_MIN, TRAINING_DURATION_MAX
+    TRAINING_DURATION_MIN, TRAINING_DURATION_MAX, GENDER_MALE, GENDER_FEMALE
 from Models.main_model import get_current_date, format_date, convert_to_binary_data
 from Models.user_model import UserModel
 from Views.logged_user_view import LoggedUserView, SetDateWindow
