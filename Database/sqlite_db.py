@@ -73,10 +73,20 @@ def query(conn, sql, data_tuple):
 # --- INSERT ---
 
 @connect
+def clear_training_types(conn):
+    sql = """
+          DELETE FROM TrainingTypes;
+          """
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    conn.commit()
+
+
+@connect
 def insert_many_training_types(conn, training_types_list):
     sql = """
-          INSERT INTO TrainingTypes (TrainingName, BurnedCaloriesPerMinPerKg)
-          VALUES (?,?) 
+          INSERT INTO TrainingTypes (IdTrainingType, TrainingName, BurnedCaloriesPerMinPerKg)
+          VALUES (?,?,?) 
           """
 
     cursor = conn.cursor()

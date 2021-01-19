@@ -14,7 +14,8 @@ class DatabaseModel:
 
         if not db_file_found:
             self.create_database_tables()
-            self.insert_default_training_types()
+
+        self.get_default_training_types()
 
     @staticmethod
     def database_file_found():
@@ -23,15 +24,18 @@ class DatabaseModel:
     def create_database_tables(self):
         sqlite_db.create_all_tables(self.conn)
 
-    def insert_default_training_types(self):
+    def get_default_training_types(self):
         json_file = open(TRAINING_TYPES_JSON_PATH, "r", encoding="utf-8")
         training_types_dict = json.load(json_file)
         json_file.close()
 
         training_types_list = list()
+        index = 1
         for t in training_types_dict:
-            training_types_list.append((t['training_name'], t['burned_calories_per_min_per_kg']))
+            training_types_list.append((index, t['training_name'], t['burned_calories_per_min_per_kg']))
+            index += 1
 
+        sqlite_db.clear_training_types(self.conn)
         sqlite_db.insert_many_training_types(self.conn, training_types_list)
 
     # --- INSERT ---

@@ -999,4 +999,3 @@ class UserController:
         self.user_trainings_view.update_trainings()
         self.logged_user_view.update_user_status_view()
 
-    # --- RAPORTS VIEW ---
